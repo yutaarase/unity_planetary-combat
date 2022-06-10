@@ -8,79 +8,107 @@ namespace Mirror.PlanetaryCombat
     public class Player : NetworkBehaviour
     {
 
-        public float mouseSensitivityX = 1;
-        public float mouseSensitivityY = 1;
-        public float walkSpeed = 6;
-        public float jumpForce = 220;
-        public LayerMask groundedMask;
+		[SerializeField] private float mouseSensitivityX = 1;
+        [SerializeField] private float mouseSensitivityY = 1;
+		[SerializeField] private float walkSpeed = 6;
+		[SerializeField] private float jumpForce = 220;
+		[SerializeField] private LayerMask groundedMask;
+
+		[SerializeField] private float offsetX;
+		[SerializeField] private float offsetY;
+		[SerializeField] private float offsetZ;
+
+		[SerializeField] private new GameObject camera;
+
+		[SerializeField] private Transform aim;
+
+		bool grounded;
+
+        Rigidbody rb;
 
 
-        bool grounded;
-        Vector3 moveAmount;
-        Vector3 smoothMoveVelocity;
-        float verticalLookRotation;
-        Transform cameraTransform;
-        Rigidbody rigidbody;
-
-        // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
+			rb = GetComponent<Rigidbody>();
+		}
 
-        }
+
+        public override void OnStartLocalPlayer()
+        {
+            base.OnStartLocalPlayer();
+			camera = Instantiate(camera);
+			camera.transform.rotation = transform.rotation;
+			camera.transform.position = transform.position + new Vector3(offsetX, offsetY, offsetZ);
+			camera.transform.SetParent(transform);
+			camera.transform.localEulerAngles = new Vector3(6.5f, 0, 0);
+
+		}
 
         // Update is called once per frame
         void Update()
         {
-            // movement for local player
-            if (isLocalPlayer)
-            {
-				// Look rotation:
-				transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * mouseSensitivityX);
-				verticalLookRotation += Input.GetAxis("Mouse Y") * mouseSensitivityY;
-				verticalLookRotation = Mathf.Clamp(verticalLookRotation, -60, 60);
-				cameraTransform.localEulerAngles = new Vector3(6.5f, 0, 0);
+			if (!isLocalPlayer) return;
 
-				// Calculate movement:
-				float inputX = Input.GetAxisRaw("Horizontal");
-				float inputY = Input.GetAxisRaw("Vertical");
+			var hori = Input.GetAxis("Horizontal");
+			var vert = Input.GetAxis("Vertical");
 
-				Vector3 moveDir = new Vector3(inputX, 0, inputY).normalized;
-				Vector3 targetMoveAmount = moveDir * walkSpeed;
-				moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, .15f);
+			Vector3 moveVect = transform.right * hori + transform.forward * vert;
 
-				// Grounded check
-				Ray ray = new Ray(transform.position, -transform.up);
-				RaycastHit hit;
-
-				if (Physics.Raycast(ray, out hit, 1 + .1f, groundedMask))
-				{
-					grounded = true;
-				}
-				else
-				{
-					grounded = false;
-				}
-
-				// Jump
-				if (Input.GetButtonDown("Jump"))
-				{
-					if (grounded)
-					{
-						rigidbody.AddForce(transform.up * jumpForce);
-					}
-				}
+			if (moveVect != Vector3.zero)
+			{
+				PlayerMove(moveVect * 0.1f);
 			}
+
+			// Grounded check
+			Ray ray = new Ray(transform.position, -transform.up);
+			RaycastHit hit;
+
+			if (Physics.Raycast(ray, out hit, 1 + .1f, groundedMask))
+			{
+				grounded = true;
+			}
+			else
+			{
+				grounded = false;
+			}
+
+			// Jump
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				Jump();	
+			}
+
+			Rotate(Input.GetAxis("Mouse X"));
         }
 
-		void FixedUpdate()
-		{
-			// movement for local player
-			if (isLocalPlayer)
-            {
-				// Apply movement to rigidbody
-				Vector3 localMove = transform.TransformDirection(moveAmount) * Time.fixedDeltaTime;
-				rigidbody.MovePosition(rigidbody.position + localMove);
+
+		[Command]
+		void Jump()
+        {
+			if (grounded)
+			{
+				rb.AddForce(transform.up * jumpForce);
 			}
 		}
-	}
+
+		[Command]
+		void Rotate(float x)
+        {
+			transform.Rotate(Vector3.up * x * mouseSensitivityX);
+			Ray ray = camera.GetComponent<Camera>().ScreenPointToRay(aim.position);
+			transform.rotation = Quaternion.LookRotation(ray.direction);
+		}
+
+		[Command]
+		void PlayerMove(Vector3 vect)
+		{
+			rb.MovePosition(vect + transform.position);
+		}
+
+		[ServerCallback]
+        private void OnCollisionStay(Collision collision)
+        {
+            
+        }
+    }
 }

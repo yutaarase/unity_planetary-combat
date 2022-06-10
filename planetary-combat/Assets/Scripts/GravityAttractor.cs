@@ -9,15 +9,15 @@ namespace Mirror.PlanetaryCombat
 		public float gravity = -9.8f;
 
 		[ServerCallback]
-		public void Attract(Rigidbody body)
+		public void Attract(Rigidbody rb)
 		{
-			Vector3 gravityUp = (body.position - transform.position).normalized;
-			Vector3 localUp = body.transform.up;
+			Vector3 gravityUp = (rb.position - transform.position).normalized;
+			Vector3 localUp = rb.transform.up;
 
 			// Apply downwards gravity to body
-			body.AddForce(gravityUp * gravity);
+			rb.AddForce(gravityUp * gravity);
 			// Allign bodies up axis with the centre of planet
-			body.rotation = Quaternion.RotateTowards(body.rotation, Quaternion.FromToRotation(localUp, gravityUp) * body.rotation, 5);
+			rb.rotation = Quaternion.RotateTowards(rb.rotation, Quaternion.FromToRotation(localUp, gravityUp) * rb.rotation, 5);
 
 		}
 	}
