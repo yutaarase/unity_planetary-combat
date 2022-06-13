@@ -20,8 +20,6 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField] private new GameObject camera;
 
-		[SerializeField] private Transform aim;
-
 		bool grounded;
 
         Rigidbody rb;
@@ -78,7 +76,7 @@ namespace Mirror.PlanetaryCombat
 				Jump();	
 			}
 
-			Rotate(Input.GetAxis("Mouse X"));
+			Rotate(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         }
 
 
@@ -92,11 +90,13 @@ namespace Mirror.PlanetaryCombat
 		}
 
 		[Command]
-		void Rotate(float x)
+		void Rotate(float x, float y)
         {
 			transform.Rotate(Vector3.up * x * mouseSensitivityX);
-			Ray ray = camera.GetComponent<Camera>().ScreenPointToRay(aim.position);
+			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			transform.rotation = Quaternion.LookRotation(ray.direction);
+
 		}
 
 		[Command]
