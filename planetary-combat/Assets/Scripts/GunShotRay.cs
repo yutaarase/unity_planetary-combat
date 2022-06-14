@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunRay : MonoBehaviour
+public class GunShotRay : MonoBehaviour
 {
     public float outTime = 0.25f;
     public Color color;
@@ -24,13 +24,15 @@ public class GunRay : MonoBehaviour
             cTime = 0;
         }
     }
-    
+
     void TestRay()
     {
         float distance = 100; // 飛ばす&表示するRayの長さ
         float duration = 1;   // 表示期間（秒）
 
-        Ray ray = new Ray(transform.position, transform.forward);
+        Vector3 vect = Camera.main.transform.forward - (transform.position - Camera.main.transform.position).normalized;
+        Ray ray = new Ray(transform.position, vect);
+
         Debug.DrawRay(ray.origin, ray.direction * distance, color, duration, false);
     }
 }

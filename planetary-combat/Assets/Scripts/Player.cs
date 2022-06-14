@@ -14,15 +14,23 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField] private float jumpForce = 220;
 		[SerializeField] private LayerMask groundedMask;
 
-		[SerializeField] private float offsetX;
-		[SerializeField] private float offsetY;
-		[SerializeField] private float offsetZ;
+		[SerializeField] private float offsetX = 0;
+		[SerializeField] private float offsetY = 3;
+		[SerializeField] private float offsetZ = -3;
+
+		[SerializeField] private float rotateX = 6.5f;
+		[SerializeField] private float rotateY = 2f;
+		[SerializeField] private float rotateZ = 0f;
+
+		[SerializeField] private float rotateSpeed = 1;
 
 		[SerializeField] private new GameObject camera;
 
 		bool grounded;
 
         Rigidbody rb;
+
+
 
 
         private void Start()
@@ -38,8 +46,8 @@ namespace Mirror.PlanetaryCombat
 			camera.transform.rotation = transform.rotation;
 			camera.transform.position = transform.position + new Vector3(offsetX, offsetY, offsetZ);
 			camera.transform.SetParent(transform);
-			camera.transform.localEulerAngles = new Vector3(6.5f, 0, 0);
-
+			camera.transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
+			Cursor.visible = false;
 		}
 
         // Update is called once per frame
@@ -94,8 +102,7 @@ namespace Mirror.PlanetaryCombat
         {
 			transform.Rotate(Vector3.up * x * mouseSensitivityX);
 			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			transform.rotation = Quaternion.LookRotation(ray.direction);
+			TestRay();
 
 		}
 
@@ -110,5 +117,14 @@ namespace Mirror.PlanetaryCombat
         {
             
         }
-    }
+
+		void TestRay()
+		{
+			float distance = 100; // 飛ばす&表示するRayの長さ
+			float duration = 1;   // 表示期間（秒）
+
+			Ray ray = new Ray(camera.transform.position, camera.transform.forward);
+			Debug.DrawRay(ray.origin, ray.direction * distance, Color.blue, duration, false);
+		}
+	}
 }

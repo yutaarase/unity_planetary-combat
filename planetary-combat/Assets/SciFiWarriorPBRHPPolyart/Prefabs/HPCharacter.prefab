@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9047216421678040258}
   - component: {fileID: 1608969250506754806}
+  - component: {fileID: 157945782149221088}
   m_Layer: 0
   m_Name: ShotPoint
   m_TagString: Untagged
@@ -44,7 +45,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef3b77b403e546efa5c225703e72f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outTime: 3
+  outTime: 0.25
+  color: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &157945782149221088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4866631954477877486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b80fdbc1ee6ca4696844770991c8ee6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outTime: 0.25
+  color: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &7673487251499248672
 GameObject:
   m_ObjectHideFlags: 0
@@ -2136,6 +2152,7 @@ GameObject:
   - component: {fileID: -3334057422174278758}
   - component: {fileID: 4625661828891528520}
   - component: {fileID: -130243008976123723}
+  - component: {fileID: 4121393815862488848}
   m_Layer: 0
   m_Name: HPCharacter
   m_TagString: Player
@@ -2212,7 +2229,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0.01
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -2252,8 +2269,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   offsetX: 0
-  offsetY: 2
-  offsetZ: 0
+  offsetY: 3
+  offsetZ: -3
+  rotateX: 6.5
+  rotateY: 2
+  rotateZ: 0
+  rotateSpeed: 2
   camera: {fileID: 3367346790686329563, guid: c72e92c5b7c0b41b7bcbb77eaeaca751, type: 3}
 --- !u!136 &4625661828891528520
 CapsuleCollider:
@@ -2303,6 +2324,20 @@ MonoBehaviour:
   showGizmos: 0
   showOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+--- !u!114 &4121393815862488848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7673487251499248760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aef3b77b403e546efa5c225703e72f6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outTime: 0.25
+  color: {r: 0, g: 1, b: 0.12997723, a: 1}
 --- !u!1 &7673487251499248762
 GameObject:
   m_ObjectHideFlags: 0
