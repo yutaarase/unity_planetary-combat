@@ -12,7 +12,6 @@ namespace Mirror.PlanetaryCombat
         [SerializeField] private float mouseSensitivityY = 1;
 		[SerializeField] private float walkSpeed = 6;
 		[SerializeField] private float jumpForce = 220;
-		[SerializeField] private LayerMask groundedMask;
 
 		[SerializeField] private float offsetX = 0;
 		[SerializeField] private float offsetY = 3;
@@ -22,9 +21,9 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField] private float rotateY = 2f;
 		[SerializeField] private float rotateZ = 0f;
 
-		[SerializeField] private float rotateSpeed = 1;
+		[SerializeField] private new GameObject camera;
 
-		[SerializeField] private GameObject camera;
+		AnimationManager animation;
 
 		bool grounded;
 
@@ -36,6 +35,7 @@ namespace Mirror.PlanetaryCombat
         private void Start()
         {
 			rb = GetComponent<Rigidbody>();
+			animation = GetComponent<AnimationManager>();
 		}
 
 
@@ -63,18 +63,37 @@ namespace Mirror.PlanetaryCombat
 			if (moveVect != Vector3.zero)
 			{
 				PlayerMove(moveVect * 0.1f);
+				animation.Action(AnimationManager.ActionID.Walk);
+				animation.Move(hori,vert);
+
+				if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                {
+					animation.Action(AnimationManager.ActionID.Dush);
+					PlayerMove(transform.forward * vert * 0.2f);
+                }
+			}
+
+            if (Input.GetMouseButton(0))
+            {
+				animation.Action(AnimationManager.ActionID.Walk);
+				animation.Fire(AnimationManager.Shot.Fire);
+            }
+            else
+            {
+				animation.Fire(AnimationManager.Shot.Cease);
 			}
 
 			// Jump
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				Jump();
+				animation.Action(AnimationManager.ActionID.Jump);
 			}
 
 			var rotX = Input.GetAxis("Mouse X");
 			var rotY = Input.GetAxis("Mouse Y");
 
-			Rotate(rotX, rotY);
+			CharaRotate(rotX);
 			CameraRotate(rotY);
         }
 
@@ -92,24 +111,23 @@ namespace Mirror.PlanetaryCombat
 		}
 
 		[Command]
-		void Rotate(float x, float y)
+		void CharaRotate(float x)
         {
 			transform.Rotate(Vector3.up * x * mouseSensitivityX);
-			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
 			TestRay();
 
+		}
+
+		[Client]
+		void CameraRotate(float y)
+        {
+			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
 		}
 
 		[Command]
 		void PlayerMove(Vector3 vect)
 		{
 			rb.MovePosition(vect + transform.position);
-		}
-
-		[ServerCallback]
-		void CameraRotate(float y)
-        {
-			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
 		}
 
 		[ServerCallback]
