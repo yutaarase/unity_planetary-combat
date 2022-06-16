@@ -24,7 +24,7 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField] private float rotateSpeed = 1;
 
-		[SerializeField] private new GameObject camera;
+		[SerializeField] private GameObject camera;
 
 		bool grounded;
 
@@ -65,26 +65,17 @@ namespace Mirror.PlanetaryCombat
 				PlayerMove(moveVect * 0.1f);
 			}
 
-			// Grounded check
-			Ray ray = new Ray(transform.position, -transform.up);
-			RaycastHit hit;
-
-			if (Physics.Raycast(ray, out hit, 1 + .1f, groundedMask))
-			{
-				grounded = true;
-			}
-			else
-			{
-				grounded = false;
-			}
-
 			// Jump
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
-				Jump();	
+				Jump();
 			}
 
-			Rotate(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+			var rotX = Input.GetAxis("Mouse X");
+			var rotY = Input.GetAxis("Mouse Y");
+
+			Rotate(rotX, rotY);
+			CameraRotate(rotY);
         }
 
 
@@ -94,7 +85,10 @@ namespace Mirror.PlanetaryCombat
 			if (grounded)
 			{
 				rb.AddForce(transform.up * jumpForce);
+				grounded = false;
 			}
+
+			Debug.Log("Jump");
 		}
 
 		[Command]
@@ -113,10 +107,23 @@ namespace Mirror.PlanetaryCombat
 		}
 
 		[ServerCallback]
+		void CameraRotate(float y)
+        {
+			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
+		}
+
+		[ServerCallback]
         private void OnCollisionStay(Collision collision)
         {
-            
-        }
+			if(collision.collider.gameObject.tag == "Planet")
+            {
+				grounded = true;
+			}
+			else
+			{
+				grounded = false;
+			}
+		}
 
 		void TestRay()
 		{

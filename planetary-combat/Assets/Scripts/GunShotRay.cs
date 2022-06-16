@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GunShotRay : MonoBehaviour
 {
+    public float range = 100;
     public float outTime = 0.25f;
     public Color color;
     private float cTime;
@@ -30,7 +31,7 @@ public class GunShotRay : MonoBehaviour
         float distance = 100; // 飛ばす&表示するRayの長さ
         float duration = 1;   // 表示期間（秒）
 
-        Vector3 vect = Camera.main.transform.forward - (transform.position - Camera.main.transform.position).normalized;
+        Vector3 vect = Camera.main.transform.forward * range - (transform.position - Camera.main.transform.position);
         Ray ray = new Ray(transform.position, vect);
 
         Debug.DrawRay(ray.origin, ray.direction * distance, color, duration, false);
