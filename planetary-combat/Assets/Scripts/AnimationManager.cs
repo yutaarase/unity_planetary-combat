@@ -33,12 +33,14 @@ namespace Mirror.PlanetaryCombat
         {
             animator.SetFloat("Blend_x", x);
             animator.SetFloat("Blend_y", y);
+            animator.SetFloat("Move",Mathf.Abs(x)+ Mathf.Abs(y)/2);
         }
 
         [Command]
         public void Fire(Shot shot)
         {
-            animator.SetFloat("Shot", (int)shot);
+            animator.SetFloat("Fire", (int)shot);
+            Move(animator.GetFloat("Blend_x")/ 1.8f, animator.GetFloat("Blend_y") / 1.8f);
         }
 
         [Command]

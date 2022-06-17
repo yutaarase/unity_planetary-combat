@@ -23,16 +23,22 @@ namespace Mirror.PlanetaryCombat
 		void FixedUpdate()
 		{
 			// Allow this body to be influenced by planet's gravity
-			planet.Attract(rb);
+			test();
+		}
+
+        [ServerCallback]
+		private void OnTriggerEnter(Collider other)
+		{
+			if (other.transform.parent.tag == "Planet")
+			{
+				planet = other.transform.parent.gameObject.GetComponent<GravityAttractor>();
+			}
 		}
 
 		[ServerCallback]
-		private void OnTriggerEnter(Collider other)
-		{
-			if (other.tag == "Planet")
-			{
-				planet = other.gameObject.GetComponent<GravityAttractor>();
-			}
+		void test()
+        {
+			planet.Attract(rb);
 		}
 	}
 }
