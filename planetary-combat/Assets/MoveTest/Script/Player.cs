@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Mirror.Test
+namespace Mirror.MoveTest
 {
     public class Player : NetworkBehaviour
     {
