@@ -10,7 +10,6 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField] private float mouseSensitivityX = 1;
         [SerializeField] private float mouseSensitivityY = 1;
-		[SerializeField] private float walkSpeed = 6;
 		[SerializeField] private float jumpForce = 330;
 		[SerializeField] private float flyForce = 5;
 
@@ -113,10 +112,6 @@ namespace Mirror.PlanetaryCombat
 					Fly();
 				}
 			}
-
-			
-
-			
 
 
             if (!Input.anyKey)
