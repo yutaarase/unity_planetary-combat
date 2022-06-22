@@ -28,7 +28,7 @@ namespace Mirror.PlanetaryCombat
         }
 
 
-        [Command]
+        [Client]
         public void Move(float x, float y)
         {
             animator.SetFloat("Blend_x", x);
@@ -36,17 +36,27 @@ namespace Mirror.PlanetaryCombat
             animator.SetFloat("Move",Mathf.Abs(x)+ Mathf.Abs(y)/2);
         }
 
-        [Command]
+        [Client]
         public void Fire(Shot shot)
         {
             animator.SetFloat("Fire", (int)shot);
-            Move(animator.GetFloat("Blend_x")/ 1.8f, animator.GetFloat("Blend_y") / 1.8f);
+            if (actionID == ActionID.Walk)
+            {
+                Move(animator.GetFloat("Blend_x") / 1.8f, animator.GetFloat("Blend_y") / 1.8f);
+            }
         }
 
-        [Command]
+        [Client]
         public void Action(ActionID id)
         {
             animator.SetInteger("ActionID", (int)id);
+            actionID = id;
+        }
+
+        [Client]
+        public void Fly(float p)
+        {
+            animator.SetFloat("Fly",p);
         }
 
         public enum ActionID
@@ -66,7 +76,7 @@ namespace Mirror.PlanetaryCombat
         }
 
         public enum Shot
-        { 
+        {
             Cease,
             Fire
         }

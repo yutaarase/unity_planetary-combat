@@ -80,18 +80,34 @@ namespace Mirror.PlanetaryCombat
 					{
 						PlayerMove(moveVect * 0.1f);
 					}
-                }
-                else
+
+					if (!Input.anyKey)
+					{
+						animation.Action(AnimationManager.ActionID.Idle);
+						animation.Fire(AnimationManager.Shot.Cease);
+					}
+
+				}
+				else
                 {
 					PlayerMove(moveVect * 0.1f);
 				}
 			}
 
             if (Input.GetMouseButton(0))
-            {
-				animation.Action(AnimationManager.ActionID.Walk);
+			{
+				if (grounded)
+				{
+					animation.Action(AnimationManager.ActionID.Walk);
+				}
+				else
+				{
+					animation.Action(AnimationManager.ActionID.Fly);
+					animation.Fly(0.5f);
+				}
+
 				animation.Fire(AnimationManager.Shot.Fire);
-            }
+			}
             else
             {
 				animation.Fire(AnimationManager.Shot.Cease);
@@ -114,11 +130,7 @@ namespace Mirror.PlanetaryCombat
 			}
 
 
-            if (!Input.anyKey)
-            {
-				animation.Action(AnimationManager.ActionID.Idle);
-				animation.Fire(AnimationManager.Shot.Cease);
-            }
+            
 
 			var rotX = Input.GetAxis("Mouse X");
 			var rotY = Input.GetAxis("Mouse Y");
@@ -139,11 +151,13 @@ namespace Mirror.PlanetaryCombat
 			}
 		}
 
+		[Command]
 		void Fly()
         {
             if (!grounded)
             {
 				animation.Action(AnimationManager.ActionID.Fly);
+				animation.Fly(1f);
 				rb.AddForce(transform.up * flyForce);
 			}
         }
@@ -170,7 +184,16 @@ namespace Mirror.PlanetaryCombat
 			rb.MovePosition(vect + transform.position);
 		}
 
-		[ServerCallback]
+        [ServerCallback]
+        private void OnCollisionEnter(Collision collision)
+        {
+			if (collision.collider.gameObject.tag == "Planet")
+			{
+				animation.Action(AnimationManager.ActionID.Idle);
+			}
+		}
+
+        [ServerCallback]
         private void OnCollisionStay(Collision collision)
         {
 			if(collision.collider.gameObject.tag == "Planet")
@@ -180,6 +203,7 @@ namespace Mirror.PlanetaryCombat
 			else
 			{
 				grounded = false;
+				animation.Action(AnimationManager.ActionID.Fly);
 			}
 		}
 
