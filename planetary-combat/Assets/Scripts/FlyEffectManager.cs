@@ -42,12 +42,12 @@ namespace Mirror.PlanetaryCombat
         // Update is called once per frame
         void Update()
         {
-            if (!isLocalPlayer) return; 
+            if (!isLocalPlayer) return;
             FlyMotion(manager.actionID == AnimationManager.ActionID.Fly);
             
         }
 
-        [Client]
+        [Command]
         void FlyMotion(bool isFly)
         {
             for (int i = 0; i < effectNum; ++i)

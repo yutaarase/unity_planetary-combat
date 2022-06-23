@@ -25,7 +25,8 @@ namespace Mirror.PlanetaryCombat
 
 		AnimationManager animation;
 
-		bool grounded;
+
+		[SyncVar]bool grounded;
 
         Rigidbody rb;
 
@@ -48,6 +49,7 @@ namespace Mirror.PlanetaryCombat
 			camera.transform.SetParent(transform);
 			camera.transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
 			Cursor.visible = false;
+			grounded = false;
 		}
 
         // Update is called once per frame
@@ -65,48 +67,39 @@ namespace Mirror.PlanetaryCombat
                 if (grounded)
                 {
 					animation.Action(AnimationManager.ActionID.Walk);
-					animation.Move(hori, vert);
 
-					if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-					{
-						animation.Action(AnimationManager.ActionID.Dush);
-						PlayerMove(transform.forward * vert * 0.2f);
-					}
-					else if (Input.GetMouseButton(0))
+					if (Input.GetMouseButton(0))
 					{
 						PlayerMove(moveVect * 0.05f);
+						animation.Move(hori /1.8f, vert/1.8f);
 					}
 					else
 					{
-						PlayerMove(moveVect * 0.1f);
+						if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+						{
+							animation.Action(AnimationManager.ActionID.Dush);
+							PlayerMove(transform.forward * vert * 0.2f);
+                        }
+                        else
+                        {
+							PlayerMove(moveVect * 0.1f);
+						}
+						animation.Move(hori, vert);
 					}
-
-					if (!Input.anyKey)
-					{
-						animation.Action(AnimationManager.ActionID.Idle);
-						animation.Fire(AnimationManager.Shot.Cease);
-					}
-
-				}
-				else
+                }
+                else
                 {
 					PlayerMove(moveVect * 0.1f);
 				}
-			}
+            }
+            else
+            {
+				animation.Action(AnimationManager.ActionID.Idle);
+            }
 
             if (Input.GetMouseButton(0))
 			{
-				if (grounded)
-				{
-					animation.Action(AnimationManager.ActionID.Walk);
-				}
-				else
-				{
-					animation.Action(AnimationManager.ActionID.Fly);
-					animation.Fly(0.5f);
-				}
-
-				animation.Fire(AnimationManager.Shot.Fire);
+				Fire();
 			}
             else
             {
@@ -120,7 +113,6 @@ namespace Mirror.PlanetaryCombat
 				if (Input.GetKeyDown(KeyCode.Space))
 				{
 					Jump();
-
 				}
 
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
@@ -130,14 +122,19 @@ namespace Mirror.PlanetaryCombat
 			}
 
 
-            
+
+			if (!Input.anyKey)
+			{
+				if (grounded) animation.Action(AnimationManager.ActionID.Idle);
+				animation.Fire(AnimationManager.Shot.Cease);
+			}
 
 			var rotX = Input.GetAxis("Mouse X");
 			var rotY = Input.GetAxis("Mouse Y");
 
 			CharaRotate(rotX,rotY);
 			CameraRotate(rotY);
-        }
+		}
 
 
 		[Command]
@@ -162,6 +159,21 @@ namespace Mirror.PlanetaryCombat
 			}
         }
 
+        [Command]
+		void Fire()
+        {
+			if (grounded)
+			{
+				animation.Action(AnimationManager.ActionID.Walk);
+			}
+			else
+			{
+				animation.Action(AnimationManager.ActionID.Fly);
+				animation.Fly(0.5f);
+			}
+			animation.Fire(AnimationManager.Shot.Fire);
+		}
+
 		[Command]
 		void CharaRotate(float x, float y)
         {
@@ -184,7 +196,7 @@ namespace Mirror.PlanetaryCombat
 			rb.MovePosition(vect + transform.position);
 		}
 
-        [ServerCallback]
+        [Server]
         private void OnCollisionEnter(Collision collision)
         {
 			if (collision.collider.gameObject.tag == "Planet")
@@ -193,7 +205,7 @@ namespace Mirror.PlanetaryCombat
 			}
 		}
 
-        [ServerCallback]
+        [Server]
         private void OnCollisionStay(Collision collision)
         {
 			if(collision.collider.gameObject.tag == "Planet")
