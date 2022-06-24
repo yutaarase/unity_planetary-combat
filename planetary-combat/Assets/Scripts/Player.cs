@@ -28,6 +28,8 @@ namespace Mirror.PlanetaryCombat
 
 		[SyncVar]bool grounded;
 
+		[SyncVar] public ActionID actionID;
+
         Rigidbody rb;
 
 
@@ -50,6 +52,7 @@ namespace Mirror.PlanetaryCombat
 			camera.transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
 			Cursor.visible = false;
 			grounded = false;
+			actionID = ActionID.Fly;
 		}
 
         // Update is called once per frame
@@ -66,7 +69,7 @@ namespace Mirror.PlanetaryCombat
 			{
                 if (grounded)
                 {
-					animation.Action(AnimationManager.ActionID.Walk);
+					actionID = ActionID.Walk;
 
 					if (Input.GetMouseButton(0))
 					{
@@ -77,7 +80,7 @@ namespace Mirror.PlanetaryCombat
 					{
 						if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
 						{
-							animation.Action(AnimationManager.ActionID.Dush);
+							actionID = ActionID.Dush;
 							PlayerMove(transform.forward * vert * 0.2f);
                         }
                         else
@@ -89,21 +92,17 @@ namespace Mirror.PlanetaryCombat
                 }
                 else
                 {
-					PlayerMove(moveVect * 0.1f);
+					PlayerMove(moveVect * 0.2f);
 				}
-            }
-            else
-            {
-				animation.Action(AnimationManager.ActionID.Idle);
             }
 
             if (Input.GetMouseButton(0))
 			{
-				Fire();
+				Fire(AnimationManager.Shot.Fire);
 			}
             else
             {
-				animation.Fire(AnimationManager.Shot.Cease);
+				Fire(AnimationManager.Shot.Cease);
 			}
 
 
@@ -125,8 +124,9 @@ namespace Mirror.PlanetaryCombat
 
 			if (!Input.anyKey)
 			{
-				if (grounded) animation.Action(AnimationManager.ActionID.Idle);
-				animation.Fire(AnimationManager.Shot.Cease);
+				if (grounded) actionID = ActionID.Idle;
+				Fire(AnimationManager.Shot.Cease);
+				animation.Action(actionID);
 			}
 
 			var rotX = Input.GetAxis("Mouse X");
@@ -134,6 +134,8 @@ namespace Mirror.PlanetaryCombat
 
 			CharaRotate(rotX,rotY);
 			CameraRotate(rotY);
+
+			animation.Action(actionID);
 		}
 
 
@@ -142,7 +144,7 @@ namespace Mirror.PlanetaryCombat
         {
 			if (grounded)
 			{
-				animation.Action(AnimationManager.ActionID.Jump);
+				actionID = ActionID.Jump;
 				rb.AddForce(transform.up * jumpForce);
 				grounded = false;
 			}
@@ -153,25 +155,24 @@ namespace Mirror.PlanetaryCombat
         {
             if (!grounded)
             {
-				animation.Action(AnimationManager.ActionID.Fly);
+				actionID = ActionID.Fly;
 				animation.Fly(1f);
 				rb.AddForce(transform.up * flyForce);
 			}
         }
 
         [Command]
-		void Fire()
+		void Fire(AnimationManager.Shot shot)
         {
-			if (grounded)
-			{
-				animation.Action(AnimationManager.ActionID.Walk);
-			}
-			else
-			{
-				animation.Action(AnimationManager.ActionID.Fly);
-				animation.Fly(0.5f);
-			}
-			animation.Fire(AnimationManager.Shot.Fire);
+			if (!grounded)animation.Fly(0.5f);
+			animation.Fire(shot);
+		}
+
+
+		[Command]
+		void PlayerMove(Vector3 vect)
+		{
+			rb.MovePosition(vect + transform.position);
 		}
 
 		[Command]
@@ -186,26 +187,20 @@ namespace Mirror.PlanetaryCombat
 
 		[Client]
 		void CameraRotate(float y)
-        {
+		{
 			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
 		}
 
-		[Command]
-		void PlayerMove(Vector3 vect)
-		{
-			rb.MovePosition(vect + transform.position);
-		}
-
-        [Server]
+		[ServerCallback]
         private void OnCollisionEnter(Collision collision)
         {
 			if (collision.collider.gameObject.tag == "Planet")
 			{
-				animation.Action(AnimationManager.ActionID.Idle);
+				actionID = ActionID.Idle;
 			}
 		}
 
-        [Server]
+        [ServerCallback]
         private void OnCollisionStay(Collision collision)
         {
 			if(collision.collider.gameObject.tag == "Planet")
@@ -215,7 +210,7 @@ namespace Mirror.PlanetaryCombat
 			else
 			{
 				grounded = false;
-				animation.Action(AnimationManager.ActionID.Fly);
+				actionID = ActionID.Fly;
 			}
 		}
 
@@ -226,6 +221,16 @@ namespace Mirror.PlanetaryCombat
 
 			Ray ray = new Ray(camera.transform.position, camera.transform.forward);
 			Debug.DrawRay(ray.origin, ray.direction * distance, Color.blue, duration, false);
+		}
+
+		public enum ActionID
+		{
+			Idle,
+			Walk,
+			Dush,
+			Jump,
+			Fly,
+			Die
 		}
 	}
 }

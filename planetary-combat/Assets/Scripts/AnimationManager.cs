@@ -8,8 +8,6 @@ namespace Mirror.PlanetaryCombat
     {
         [SerializeField] private GunID gun;
 
-        [SyncVar] public ActionID actionID;
-
         public Shot shot;
 
         private Animator animator;
@@ -27,7 +25,7 @@ namespace Mirror.PlanetaryCombat
 
         }
 
-
+        [Command]
         public void Move(float x, float y)
         {
             animator.SetFloat("Blend_x", x);
@@ -35,30 +33,22 @@ namespace Mirror.PlanetaryCombat
             animator.SetFloat("Move",Mathf.Abs(x)+ Mathf.Abs(y)/2);
         }
 
+        [Server]
         public void Fire(Shot shot)
         {
             animator.SetFloat("Fire", (int)shot);
         }
 
-        public void Action(ActionID id)
+        [Command]
+        public void Action(Player.ActionID id)
         {
             animator.SetInteger("ActionID", (int)id);
-            actionID = id;
         }
 
+        [Server]
         public void Fly(float p)
         {
             animator.SetFloat("Fly",p);
-        }
-
-        public enum ActionID
-        {
-            Idle,
-            Walk,
-            Dush,
-            Jump,
-            Fly,
-            Die
         }
 
         public enum GunID

@@ -14,12 +14,14 @@ namespace Mirror.PlanetaryCombat
 
         [SerializeField] private Vector3[] effectPosition = { new Vector3(0.3f, 1.05f, -0.3f), new Vector3(-0.3f, 1.05f, -0.3f) };
 
-        private AnimationManager manager;
+        [SyncVar(hook = nameof(FlyMotion))] private bool isFly = false;
+
+        private Player player;
 
         // Start is called before the first frame update
         void Start()
         {
-            manager = GetComponent<AnimationManager>();
+            player = GetComponent<Player>();
         }
 
 
@@ -42,13 +44,18 @@ namespace Mirror.PlanetaryCombat
         // Update is called once per frame
         void Update()
         {
+            if (isServer) ServerTask();
             if (!isLocalPlayer) return;
-            FlyMotion(manager.actionID == AnimationManager.ActionID.Fly);
-            
         }
 
-        [Command]
-        void FlyMotion(bool isFly)
+        [Server]
+        void ServerTask()
+        {
+            if (player.actionID == Player.ActionID.Fly) isFly = true;
+            else isFly = false;
+        }
+
+        private void FlyMotion(bool OldBool, bool NewBool)
         {
             for (int i = 0; i < effectNum; ++i)
             {
