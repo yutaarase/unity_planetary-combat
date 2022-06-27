@@ -194,7 +194,7 @@ namespace Mirror.PlanetaryCombat
 		[ServerCallback]
         private void OnCollisionEnter(Collision collision)
         {
-			if (collision.collider.gameObject.tag == "Planet")
+			if (collision.collider.gameObject.tag == "Planet" && collision.collider.gameObject.tag == "Player")
 			{
 				actionID = ActionID.Idle;
 			}
@@ -203,13 +203,15 @@ namespace Mirror.PlanetaryCombat
         [ServerCallback]
         private void OnCollisionStay(Collision collision)
         {
-			if(collision.collider.gameObject.tag == "Planet")
+
+			if (collision.collider.gameObject.tag == "Planet")
             {
 				grounded = true;
 			}
 			else
 			{
 				grounded = false;
+				if(collision.collider.gameObject.tag == "Player")
 				actionID = ActionID.Fly;
 			}
 		}

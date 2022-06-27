@@ -43,12 +43,11 @@ namespace Mirror.PlanetaryCombat
         
         // Update is called once per frame
         void Update()
-        {
-            if (isServer) ServerTask();
+        {   ServerTask();
             if (!isLocalPlayer) return;
         }
 
-        [Server]
+        [Client]
         void ServerTask()
         {
             if (player.actionID == Player.ActionID.Fly) isFly = true;
@@ -60,6 +59,7 @@ namespace Mirror.PlanetaryCombat
             for (int i = 0; i < effectNum; ++i)
             {
                 flyeffect[i].SetActive(isFly);
+                flyeffect[i].GetComponent<Particle>().ParticlesPlay(isFly);
             }
         }
     }
