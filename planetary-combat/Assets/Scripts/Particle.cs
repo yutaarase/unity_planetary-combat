@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Mirror.PlanetaryCombat
 {
-    public class Particle : MonoBehaviour
+    public class Particle : NetworkBehaviour
     {
         public GameObject[] particle;
 

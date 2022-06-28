@@ -117,6 +117,7 @@ namespace Mirror.PlanetaryCombat
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                 {
 					Fly();
+					GetComponent<FlyEffectManager>().EffectActive(!grounded);
 				}
 			}
 
