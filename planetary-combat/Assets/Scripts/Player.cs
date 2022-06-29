@@ -8,10 +8,11 @@ namespace Mirror.PlanetaryCombat
     public class Player : NetworkBehaviour
     {
 
-		[SerializeField] private float mouseSensitivityX = 1;
-        [SerializeField] private float mouseSensitivityY = 1;
+		public float mouseSensitivityX = 1;
+		public float mouseSensitivityY = 1;
 		[SerializeField] private float jumpForce = 330;
-		[SerializeField] private float flyForce = 5;
+		[SerializeField] private float flyForce = 800;
+		[SerializeField] private float moveForce = 10;
 
 		[SerializeField] private float offsetX = 0;
 		[SerializeField] private float offsetY = 3;
@@ -22,6 +23,9 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField] private float rotateZ = 0f;
 
 		[SerializeField] private new GameObject camera;
+		[SerializeField] private Transform shotPoint;
+
+		public bool isADS = false;
 
 		AnimationManager animation;
 
@@ -39,6 +43,7 @@ namespace Mirror.PlanetaryCombat
         {
 			rb = GetComponent<Rigidbody>();
 			animation = GetComponent<AnimationManager>();
+			Application.targetFrameRate = 60;
 		}
 
 
@@ -73,7 +78,7 @@ namespace Mirror.PlanetaryCombat
 
 					if (Input.GetMouseButton(0))
 					{
-						PlayerMove(moveVect * 0.05f);
+						PlayerMove(moveVect * 0.8f);
 						animation.Move(hori /1.8f, vert/1.8f);
 					}
 					else
@@ -81,18 +86,18 @@ namespace Mirror.PlanetaryCombat
 						if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
 						{
 							actionID = ActionID.Dush;
-							PlayerMove(transform.forward * vert * 0.2f);
+							PlayerMove(transform.forward * vert * 1.5f);
                         }
                         else
                         {
-							PlayerMove(moveVect * 0.1f);
+							PlayerMove(moveVect);
 						}
 						animation.Move(hori, vert);
 					}
                 }
                 else
                 {
-					PlayerMove(moveVect * 0.2f);
+					PlayerMove(moveVect);
 				}
             }
 
@@ -117,10 +122,13 @@ namespace Mirror.PlanetaryCombat
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                 {
 					Fly();
-					GetComponent<FlyEffectManager>().EffectActive(!grounded);
 				}
 			}
 
+            if (Input.GetMouseButtonDown(1))
+            {
+				isADS = !isADS;
+			}
 
 
 			if (!Input.anyKey)
@@ -134,9 +142,9 @@ namespace Mirror.PlanetaryCombat
 			var rotY = Input.GetAxis("Mouse Y");
 
 			CharaRotate(rotX,rotY);
-			CameraRotate(rotY);
 
 			animation.Action(actionID);
+			GetComponent<FlyEffectManager>().EffectActive(!grounded && actionID == ActionID.Fly);
 		}
 
 
@@ -158,22 +166,27 @@ namespace Mirror.PlanetaryCombat
             {
 				actionID = ActionID.Fly;
 				animation.Fly(1f);
-				rb.AddForce(transform.up * flyForce);
+				rb.AddForce(transform.up * flyForce * Time.deltaTime);
 			}
         }
 
         [Command]
 		void Fire(AnimationManager.Shot shot)
         {
-			if (!grounded)animation.Fly(0.5f);
+			if(shot == AnimationManager.Shot.Fire)
+            {
+				if (!grounded) animation.Fly(0.5f);
+				else actionID = ActionID.Walk;
+			}
 			animation.Fire(shot);
+
 		}
 
 
 		[Command]
 		void PlayerMove(Vector3 vect)
 		{
-			rb.MovePosition(vect + transform.position);
+			rb.MovePosition(vect * moveForce  * Time.deltaTime + transform.position);
 		}
 
 		[Command]
@@ -182,15 +195,12 @@ namespace Mirror.PlanetaryCombat
 			transform.Rotate(Vector3.up * x * mouseSensitivityX);
 			if(!grounded) transform.Rotate(Vector3.left * y * mouseSensitivityY);
 
+			if (isADS) transform.rotation = Quaternion.LookRotation(camera.transform.forward * 100 - (shotPoint.position - camera.transform.position));
+
 			TestRay();
 
 		}
 
-		[Client]
-		void CameraRotate(float y)
-		{
-			camera.transform.Rotate(Vector3.left * y * mouseSensitivityY);
-		}
 
 		[ServerCallback]
         private void OnCollisionEnter(Collision collision)
@@ -212,7 +222,6 @@ namespace Mirror.PlanetaryCombat
 			else
 			{
 				grounded = false;
-				if(collision.collider.gameObject.tag == "Player")
 				actionID = ActionID.Fly;
 			}
 		}

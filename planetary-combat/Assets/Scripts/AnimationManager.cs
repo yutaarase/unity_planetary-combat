@@ -36,7 +36,7 @@ namespace Mirror.PlanetaryCombat
         [Server]
         public void Fire(Shot shot)
         {
-            animator.SetFloat("Fire", (int)shot);
+            animator.SetFloat("Fire", (float)shot);
         }
 
         [Command]

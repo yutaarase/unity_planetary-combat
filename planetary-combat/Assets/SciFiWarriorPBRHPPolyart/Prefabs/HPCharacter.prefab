@@ -2160,6 +2160,7 @@ GameObject:
   - component: {fileID: -1875380189889095189}
   - component: {fileID: 8387569664250839171}
   - component: {fileID: 7129975793396551244}
+  - component: {fileID: 7824937121730622758}
   m_Layer: 0
   m_Name: HPCharacter
   m_TagString: Player
@@ -2270,10 +2271,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  mouseSensitivityX: 2
+  mouseSensitivityX: 1
   mouseSensitivityY: 1
-  jumpForce: 220
-  flyForce: 11
+  jumpForce: 330
+  flyForce: 800
+  moveForce: 10
   offsetX: 0
   offsetY: 3
   offsetZ: -3
@@ -2281,6 +2283,8 @@ MonoBehaviour:
   rotateY: 2
   rotateZ: 0
   camera: {fileID: 3367346790686329563, guid: c72e92c5b7c0b41b7bcbb77eaeaca751, type: 3}
+  shotPoint: {fileID: 9047216421678040258}
+  isADS: 0
   actionID: 0
 --- !u!136 &4625661828891528520
 CapsuleCollider:
@@ -2485,6 +2489,41 @@ MonoBehaviour:
   showOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   target: {fileID: 3127831467879582572}
+--- !u!114 &7824937121730622758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7673487251499248760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 734b48bea0b204338958ee3d885e11f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  clientAuthority: 0
+  sendInterval: 0.05
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 0
+  bufferTimeMultiplier: 1
+  bufferSizeLimit: 64
+  catchupThreshold: 4
+  catchupMultiplier: 0.1
+  onlySyncOnChange: 1
+  bufferResetMultiplier: 5
+  positionSensitivity: 0.01
+  rotationSensitivity: 0.01
+  scaleSensitivity: 0.01
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  target: {fileID: 9047216421678040258}
 --- !u!1 &7673487251499248762
 GameObject:
   m_ObjectHideFlags: 0
