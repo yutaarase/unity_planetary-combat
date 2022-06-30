@@ -14,14 +14,6 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField] private float flyForce = 800;
 		[SerializeField] private float moveForce = 10;
 
-		[SerializeField] private float offsetX = 0;
-		[SerializeField] private float offsetY = 3;
-		[SerializeField] private float offsetZ = -3;
-
-		[SerializeField] private float rotateX = 6.5f;
-		[SerializeField] private float rotateY = 2f;
-		[SerializeField] private float rotateZ = 0f;
-
 		[SerializeField] private new GameObject camera;
 		[SerializeField] private Transform shotPoint;
 
@@ -51,10 +43,7 @@ namespace Mirror.PlanetaryCombat
         {
             base.OnStartLocalPlayer();
 			camera = Instantiate(camera);
-			camera.transform.rotation = transform.rotation;
-			camera.transform.position = transform.position + new Vector3(offsetX, offsetY, offsetZ);
 			camera.transform.SetParent(transform);
-			camera.transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
 			Cursor.visible = false;
 			grounded = false;
 			actionID = ActionID.Fly;
@@ -128,6 +117,7 @@ namespace Mirror.PlanetaryCombat
             if (Input.GetMouseButtonDown(1))
             {
 				isADS = !isADS;
+				camera.GetComponent<CameraController>().ADS(isADS);
 			}
 
 
@@ -194,9 +184,6 @@ namespace Mirror.PlanetaryCombat
         {
 			transform.Rotate(Vector3.up * x * mouseSensitivityX);
 			if(!grounded) transform.Rotate(Vector3.left * y * mouseSensitivityY);
-
-			if (isADS) transform.rotation = Quaternion.LookRotation(camera.transform.forward * 100 - (shotPoint.position - camera.transform.position));
-
 			TestRay();
 
 		}
