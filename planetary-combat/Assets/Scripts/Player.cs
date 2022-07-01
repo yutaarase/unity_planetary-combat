@@ -118,6 +118,11 @@ namespace Mirror.PlanetaryCombat
             {
 				isADS = !isADS;
 				camera.GetComponent<CameraController>().ADS(isADS);
+                if (isADS)
+                {
+					Vector3 vect = camera.transform.forward * 100 - (shotPoint.position - camera.transform.position);
+					transform.LookAt(vect);
+				}
 			}
 
 
