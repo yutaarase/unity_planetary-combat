@@ -16,6 +16,8 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField] private new GameObject camera;
 		[SerializeField] private Transform shotPoint;
+		public new GameObject vcamera;
+		public Transform loopOBJ;
 
 		public bool isADS = false;
 
@@ -44,6 +46,7 @@ namespace Mirror.PlanetaryCombat
             base.OnStartLocalPlayer();
 			camera = Instantiate(camera);
 			camera.transform.SetParent(transform);
+			vcamera = Instantiate(vcamera);
 			Cursor.visible = false;
 			grounded = false;
 			actionID = ActionID.Fly;
@@ -118,11 +121,13 @@ namespace Mirror.PlanetaryCombat
             {
 				isADS = !isADS;
 				camera.GetComponent<CameraController>().ADS(isADS);
-                if (isADS)
-                {
-					Vector3 vect = camera.transform.forward * 100 - (shotPoint.position - camera.transform.position);
-					transform.LookAt(vect);
-				}
+                
+			}
+
+			if (isADS)
+			{
+				Vector3 vect = camera.transform.forward * 100 - (shotPoint.position - camera.transform.position);
+				transform.RotateAround(transform.position,transform.up, Vector3.SignedAngle(transform.forward,vect.normalized,transform.up) * Time.deltaTime);
 			}
 
 
@@ -142,8 +147,13 @@ namespace Mirror.PlanetaryCombat
 			GetComponent<FlyEffectManager>().EffectActive(!grounded && actionID == ActionID.Fly);
 		}
 
+        private void FixedUpdate()
+        {
+            
+        }
 
-		[Command]
+
+        [Command]
 		void Jump()
         {
 			if (grounded)

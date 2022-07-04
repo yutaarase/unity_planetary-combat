@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
+using Cinemachine;
 
 namespace Mirror.PlanetaryCombat
 {
-    public class CameraController : MonoBehaviour
+    public class CameraController : NetworkBehaviour
     {
 
         [SerializeField] private float offsetX = 0;
@@ -19,21 +20,30 @@ namespace Mirror.PlanetaryCombat
         private Vector3 adsOffset;
 
 
-        private GameObject parent;
+        [SyncVar]private GameObject parent;
         private Player player;
         private Camera camera;
+        private CinemachineBrain brain;
+
+        CinemachineVirtualCamera vcamera;
 
 
         // Start is called before the first frame update 
         void Start()
         {
+            //各オブジェクトコンポーネント取得
             parent = transform.parent.gameObject;
             player = parent.GetComponent<Player>();
             camera = transform.GetComponent<Camera>();
+            vcamera = player.vcamera.transform.GetComponent<CinemachineVirtualCamera>();
+            brain = transform.GetComponent<CinemachineBrain>();
 
             transform.rotation = transform.parent.rotation;
             transform.localPosition = new Vector3(offsetX, offsetY, offsetZ);
             transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
+
+            vcamera.Follow = parent.transform;
+            vcamera.LookAt = parent.transform;
         }
         // Update is called once per frame
         void Update()
@@ -41,13 +51,20 @@ namespace Mirror.PlanetaryCombat
 
             var rotX = Input.GetAxis("Mouse X");
             var rotY = Input.GetAxis("Mouse Y");
-            //CameraRotate(rotX,rotY);
-
+            
             if (player.isADS)
             {
-                transform.position = parent.transform.position + adsOffset;
-                transform.RotateAround(parent.transform.position + parent.transform.up * 2 + parent.transform.forward * 10, parent.transform.up, rotX);
+
+            //    transform.position = parent.transform.position + parent.transform.up * 2 + parent.transform.forward * -10;
+            //    transform.RotateAround(parent.transform.position + parent.transform.up * 2 + parent.transform.forward * 10, parent.transform.up, rotX);
             }
+            else
+            {
+                CameraRotate(rotX, rotY);
+            }
+
+            vcamera.enabled = player.isADS;
+            brain.enabled = player.isADS;
         }
 
         public void CameraRotate(float x,float y)
@@ -84,8 +101,7 @@ namespace Mirror.PlanetaryCombat
             {
                 SetFOV(25f);
                 transform.parent = null;
-                transform.position = parent.transform.position + parent.transform.up * 2 + parent.transform.forward * -10;
-                adsOffset = transform.position - parent.transform.position;
+                //transform.position = parent.transform.position + parent.transform.up * 2 + parent.transform.forward * -10;
             }
             else
             {
