@@ -16,13 +16,13 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField] private new GameObject camera;
 		[SerializeField] private Transform shotPoint;
+
 		public new GameObject vcamera;
-		public Transform loopOBJ;
 
 		public bool isADS = false;
 
 		AnimationManager animation;
-
+		FlyEffectManager flyEffect;
 
 		[SyncVar]bool grounded;
 
@@ -35,8 +35,9 @@ namespace Mirror.PlanetaryCombat
 
         private void Start()
         {
-			rb = GetComponent<Rigidbody>();
-			animation = GetComponent<AnimationManager>();
+			if (rb == null) rb = GetComponent<Rigidbody>();
+			if (animation == null) animation = GetComponent<AnimationManager>();
+			if (flyEffect == null) flyEffect = GetComponent<FlyEffectManager>();
 			Application.targetFrameRate = 60;
 		}
 
@@ -144,7 +145,7 @@ namespace Mirror.PlanetaryCombat
 			CharaRotate(rotX,rotY);
 
 			animation.Action(actionID);
-			GetComponent<FlyEffectManager>().EffectActive(!grounded && actionID == ActionID.Fly);
+			flyEffect.EffectActive(!grounded && actionID == ActionID.Fly);
 		}
 
         private void FixedUpdate()
@@ -182,9 +183,28 @@ namespace Mirror.PlanetaryCombat
             {
 				if (!grounded) animation.Fly(0.5f);
 				else actionID = ActionID.Walk;
+				
+				Vector3 vect = camera.transform.forward * 100 - (transform.position - camera.transform.position);
+				Ray ray = new Ray(transform.position, vect);
+				RaycastHit hit;
+				if (Physics.Raycast(shotPoint.position, vect, out hit, 100))
+				{
+					if (hit.collider.tag == "Player")
+					{
+						
+						Shot(hit.collider.gameObject);
+						hit.collider.gameObject.SetActive(false);
+					}
+				}
 			}
 			animation.Fire(shot);
 
+		}
+
+		[ClientRpc]
+		void Shot(GameObject obj)
+        {
+			obj.SetActive(false);
 		}
 
 

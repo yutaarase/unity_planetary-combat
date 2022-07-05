@@ -45,6 +45,7 @@ namespace Mirror.PlanetaryCombat
             vcamera.Follow = parent.transform;
             vcamera.LookAt = parent.transform;
         }
+
         // Update is called once per frame
         void Update()
         {
@@ -52,16 +53,7 @@ namespace Mirror.PlanetaryCombat
             var rotX = Input.GetAxis("Mouse X");
             var rotY = Input.GetAxis("Mouse Y");
             
-            if (player.isADS)
-            {
-
-            //    transform.position = parent.transform.position + parent.transform.up * 2 + parent.transform.forward * -10;
-            //    transform.RotateAround(parent.transform.position + parent.transform.up * 2 + parent.transform.forward * 10, parent.transform.up, rotX);
-            }
-            else
-            {
-                CameraRotate(rotX, rotY);
-            }
+            if (!player.isADS) CameraRotate(rotX, rotY);
 
             vcamera.enabled = player.isADS;
             brain.enabled = player.isADS;
@@ -101,7 +93,6 @@ namespace Mirror.PlanetaryCombat
             {
                 SetFOV(25f);
                 transform.parent = null;
-                //transform.position = parent.transform.position + parent.transform.up * 2 + parent.transform.forward * -10;
             }
             else
             {

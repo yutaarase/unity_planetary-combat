@@ -19,8 +19,15 @@ namespace Mirror.PlanetaryCombat
         [Command]
         public void EffectActive(bool b)
         {
+            setActive(b);
+        }
+
+        [ClientRpc]
+        private void setActive(bool b)
+        {
             for (int i = 0; i < flyeffect.Length; ++i)
             {
+                if (flyeffect[i] == null) return;
                 flyeffect[i].SetActive(b);
             }
         }
