@@ -8,14 +8,6 @@ namespace Mirror.PlanetaryCombat
     {
         [SerializeField] private GameObject[] flyeffect = new GameObject[2];
 
-        Player player;
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            player = GetComponent<Player>();
-        }
-
         [Command]
         public void EffectActive(bool b)
         {

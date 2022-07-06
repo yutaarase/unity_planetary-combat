@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -61,6 +62,11 @@ namespace Mirror.PlanetaryCombat
         {
             Cease,
             Fire
+        }
+
+        internal void Action(PlayerController.ActionID actionID)
+        {
+            throw new NotImplementedException();
         }
     }
 }

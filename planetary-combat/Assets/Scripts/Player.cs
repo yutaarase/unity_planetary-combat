@@ -4,267 +4,174 @@ using UnityEngine;
 
 namespace Mirror.PlanetaryCombat
 {
-    [RequireComponent(typeof(GravityBody))]
     public class Player : NetworkBehaviour
     {
+		public string username;
 
-		public float mouseSensitivityX = 1;
-		public float mouseSensitivityY = 1;
-		[SerializeField] private float jumpForce = 330;
-		[SerializeField] private float flyForce = 800;
-		[SerializeField] private float moveForce = 10;
+		public bool isDead;
+		public bool firstSetup;
 
-		[SerializeField] private new GameObject camera;
-		[SerializeField] private Transform shotPoint;
+		[SerializeField]
+		private int maxHealth = 100;
 
-		public new GameObject vcamera;
+		[SyncVar]
+		private int currentHealth;
 
-		public bool isADS = false;
+		public int kills;
+		public int deaths;
 
-		AnimationManager animation;
-		FlyEffectManager flyEffect;
+		[SerializeField]
+		private Behaviour[] disableOnDeath;
+		private bool[] wasEnabled;
 
-		[SyncVar]bool grounded;
+		[SerializeField]
+		private GameObject[] disableGameObjectsOnDeath;
 
-		[SyncVar] public ActionID actionID;
+		[SerializeField]
+		private GameObject deathEffect;
 
-        Rigidbody rb;
+		[SerializeField]
+		private GameObject spawnEffect;
 
-
-
-
-        private void Start()
-        {
-			if (rb == null) rb = GetComponent<Rigidbody>();
-			if (animation == null) animation = GetComponent<AnimationManager>();
-			if (flyEffect == null) flyEffect = GetComponent<FlyEffectManager>();
-			Application.targetFrameRate = 60;
-		}
-
-
-        public override void OnStartLocalPlayer()
-        {
-            base.OnStartLocalPlayer();
-			camera = Instantiate(camera);
-			camera.transform.SetParent(transform);
-			vcamera = Instantiate(vcamera);
-			Cursor.visible = false;
-			grounded = false;
-			actionID = ActionID.Fly;
-		}
-
-        // Update is called once per frame
-        void Update()
-        {
-			if (!isLocalPlayer) return;
-
-			var hori = Input.GetAxis("Horizontal");
-			var vert = Input.GetAxis("Vertical");
-
-			Vector3 moveVect = transform.right * hori + transform.forward * vert;
-
-			if (moveVect != Vector3.zero)
+		
+		public void SetupPlayer()
+		{
+			if (isLocalPlayer)
 			{
-                if (grounded)
-                {
-					actionID = ActionID.Walk;
-
-					if (Input.GetMouseButton(0))
-					{
-						PlayerMove(moveVect * 0.8f);
-						animation.Move(hori /1.8f, vert/1.8f);
-					}
-					else
-					{
-						if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-						{
-							actionID = ActionID.Dush;
-							PlayerMove(transform.forward * vert * 1.5f);
-                        }
-                        else
-                        {
-							PlayerMove(moveVect);
-						}
-						animation.Move(hori, vert);
-					}
-                }
-                else
-                {
-					PlayerMove(moveVect);
-				}
-            }
-
-            if (Input.GetMouseButton(0))
-			{
-				Fire(AnimationManager.Shot.Fire);
-			}
-            else
-            {
-				Fire(AnimationManager.Shot.Cease);
+				//Switch cameras
+				GameManager.instance.SetSceneCameraActive(false);
+				GetComponent<PlayerSetup>().playerUIInstance.SetActive(true);
 			}
 
-
-			if (Input.GetKey(KeyCode.Space))
-			{
-				// Jump
-				if (Input.GetKeyDown(KeyCode.Space))
-				{
-					Jump();
-				}
-
-				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-                {
-					Fly();
-				}
-			}
-
-            if (Input.GetMouseButtonDown(1))
-            {
-				isADS = !isADS;
-				camera.GetComponent<CameraController>().ADS(isADS);
-                
-			}
-
-			if (isADS)
-			{
-				Vector3 vect = camera.transform.forward * 100 - (shotPoint.position - camera.transform.position);
-				transform.RotateAround(transform.position,transform.up, Vector3.SignedAngle(transform.forward,vect.normalized,transform.up) * Time.deltaTime);
-			}
-
-
-			if (!Input.anyKey)
-			{
-				if (grounded) actionID = ActionID.Idle;
-				Fire(AnimationManager.Shot.Cease);
-				animation.Action(actionID);
-			}
-
-			var rotX = Input.GetAxis("Mouse X");
-			var rotY = Input.GetAxis("Mouse Y");
-
-			CharaRotate(rotX,rotY);
-
-			animation.Action(actionID);
-			flyEffect.EffectActive(!grounded && actionID == ActionID.Fly);
-		}
-
-        private void FixedUpdate()
-        {
-            
-        }
-
-
-        [Command]
-		void Jump()
-        {
-			if (grounded)
-			{
-				actionID = ActionID.Jump;
-				rb.AddForce(transform.up * jumpForce);
-				grounded = false;
-			}
+			CmdBroadCastNewPlayerSetup();
 		}
 
 		[Command]
-		void Fly()
-        {
-            if (!grounded)
-            {
-				actionID = ActionID.Fly;
-				animation.Fly(1f);
-				rb.AddForce(transform.up * flyForce * Time.deltaTime);
-			}
-        }
-
-        [Command]
-		void Fire(AnimationManager.Shot shot)
-        {
-			if(shot == AnimationManager.Shot.Fire)
-            {
-				if (!grounded) animation.Fly(0.5f);
-				else actionID = ActionID.Walk;
-				
-				Vector3 vect = camera.transform.forward * 100 - (transform.position - camera.transform.position);
-				Ray ray = new Ray(transform.position, vect);
-				RaycastHit hit;
-				if (Physics.Raycast(shotPoint.position, vect, out hit, 100))
-				{
-					if (hit.collider.tag == "Player")
-					{
-						
-						Shot(hit.collider.gameObject);
-						hit.collider.gameObject.SetActive(false);
-					}
-				}
-			}
-			animation.Fire(shot);
-
+		private void CmdBroadCastNewPlayerSetup()
+		{
+			RpcSetupPlayerOnAllClients();
 		}
 
 		[ClientRpc]
-		void Shot(GameObject obj)
-        {
-			obj.SetActive(false);
-		}
-
-
-		[Command]
-		void PlayerMove(Vector3 vect)
+		private void RpcSetupPlayerOnAllClients()
 		{
-			rb.MovePosition(vect * moveForce  * Time.deltaTime + transform.position);
-		}
-
-		[Command]
-		void CharaRotate(float x, float y)
-        {
-			transform.Rotate(Vector3.up * x * mouseSensitivityX);
-			if(!grounded) transform.Rotate(Vector3.left * y * mouseSensitivityY);
-			TestRay();
-
-		}
-
-
-		[ServerCallback]
-        private void OnCollisionEnter(Collision collision)
-        {
-			if (collision.collider.gameObject.tag == "Planet" && collision.collider.gameObject.tag == "Player")
+			if (firstSetup)
 			{
-				actionID = ActionID.Idle;
+				wasEnabled = new bool[disableOnDeath.Length];
+				for (int i = 0; i < wasEnabled.Length; i++)
+				{
+					wasEnabled[i] = disableOnDeath[i].enabled;
+				}
+
+				firstSetup = false;
 			}
+
+			SetDefaults();
 		}
 
-        [ServerCallback]
-        private void OnCollisionStay(Collision collision)
-        {
+		[ClientRpc]
+		public void RpcTakeDamage(int _amount, string _sourceID)
+		{
+			if (isDead)
+				return;
 
-			if (collision.collider.gameObject.tag == "Planet")
-            {
-				grounded = true;
-			}
-			else
+			currentHealth -= _amount;
+
+			Debug.Log(transform.name + " now has " + currentHealth + " health.");
+
+			if (currentHealth <= 0)
 			{
-				grounded = false;
-				actionID = ActionID.Fly;
+				Die(_sourceID);
 			}
 		}
 
-		void TestRay()
+		private void Die(string _sourceID)
 		{
-			float distance = 100; // 飛ばす&表示するRayの長さ
-			float duration = 1;   // 表示期間（秒）
+			isDead = true;
 
-			Ray ray = new Ray(camera.transform.position, camera.transform.forward);
-			Debug.DrawRay(ray.origin, ray.direction * distance, Color.blue, duration, false);
+			Player sourcePlayer = GameManager.GetPlayer(_sourceID);
+			if (sourcePlayer != null)
+			{
+				sourcePlayer.kills++;
+				GameManager.instance.onPlayerKilledCallback.Invoke(username, sourcePlayer.username);
+			}
+
+			deaths++;
+
+			//Disable components
+			for (int i = 0; i < disableOnDeath.Length; i++)
+			{
+				disableOnDeath[i].enabled = false;
+			}
+
+			//Disable GameObjects
+			for (int i = 0; i < disableGameObjectsOnDeath.Length; i++)
+			{
+				disableGameObjectsOnDeath[i].SetActive(false);
+			}
+
+			//Disable the collider
+			Collider _col = GetComponent<Collider>();
+			if (_col != null)
+				_col.enabled = false;
+
+			//Spawn a death effect
+			GameObject _gfxIns = (GameObject)Instantiate(deathEffect, transform.position, Quaternion.identity);
+			Destroy(_gfxIns, 3f);
+
+			//Switch cameras
+			if (isLocalPlayer)
+			{
+				GameManager.instance.SetSceneCameraActive(true);
+				GetComponent<PlayerSetup>().playerUIInstance.SetActive(false);
+			}
+
+			Debug.Log(transform.name + " is DEAD!");
+
+			StartCoroutine(Respawn());
 		}
 
-		public enum ActionID
+		private IEnumerator Respawn()
 		{
-			Idle,
-			Walk,
-			Dush,
-			Jump,
-			Fly,
-			Die
+			yield return new WaitForSeconds(GameManager.instance.matchSettings.respawnTime);
+
+			Transform _spawnPoint = NetworkManager.singleton.GetStartPosition();
+			transform.position = _spawnPoint.position;
+			transform.rotation = _spawnPoint.rotation;
+
+			yield return new WaitForSeconds(0.1f);
+
+			SetupPlayer();
+
+			Debug.Log(transform.name + " respawned.");
+		}
+
+		public void SetDefaults()
+		{
+			isDead = false;
+
+			currentHealth = maxHealth;
+
+			//Enable the components
+			for (int i = 0; i < disableOnDeath.Length; i++)
+			{
+				disableOnDeath[i].enabled = wasEnabled[i];
+			}
+
+			//Enable the gameobjects
+			for (int i = 0; i < disableGameObjectsOnDeath.Length; i++)
+			{
+				disableGameObjectsOnDeath[i].SetActive(true);
+			}
+
+			//Enable the collider
+			Collider _col = GetComponent<Collider>();
+			if (_col != null)
+				_col.enabled = true;
+
+			//Create spawn effect
+			GameObject _gfxIns = (GameObject)Instantiate(spawnEffect, transform.position, Quaternion.identity);
+			Destroy(_gfxIns, 3f);
 		}
 	}
 }

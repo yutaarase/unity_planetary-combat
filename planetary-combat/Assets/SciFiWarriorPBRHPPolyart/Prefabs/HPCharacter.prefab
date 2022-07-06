@@ -2192,6 +2192,7 @@ GameObject:
   - component: {fileID: 8387569664250839171}
   - component: {fileID: 7129975793396551244}
   - component: {fileID: 7824937121730622758}
+  - component: {fileID: 5227453128224889418}
   m_Layer: 0
   m_Name: HPCharacter
   m_TagString: Player
@@ -2303,14 +2304,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  username: 
   mouseSensitivityX: 1
   mouseSensitivityY: 1
   jumpForce: 330
   flyForce: 800
   moveForce: 10
-  camera: {fileID: 3367346790686329563, guid: c72e92c5b7c0b41b7bcbb77eaeaca751, type: 3}
-  shotPoint: {fileID: 9047216421678040258}
-  vcamera: {fileID: 8147767586633497603, guid: 971926d10021d478aa6e68d0e504890d, type: 3}
+  camera: {fileID: 0}
+  shotPoint: {fileID: 0}
+  vcamera: {fileID: 0}
   isADS: 0
   actionID: 0
 --- !u!136 &4625661828891528520
@@ -2551,6 +2553,30 @@ MonoBehaviour:
   showOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   target: {fileID: 9047216421678040258}
+--- !u!114 &5227453128224889418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7673487251499248760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0dd87f30a7814cb2a49c00c2d066ba7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  mouseSensitivityX: 1
+  mouseSensitivityY: 1
+  jumpForce: 330
+  flyForce: 800
+  moveForce: 10
+  camera: {fileID: 3367346790686329563, guid: c72e92c5b7c0b41b7bcbb77eaeaca751, type: 3}
+  shotPoint: {fileID: 9047216421678040258}
+  vcamera: {fileID: 8147767586633497603, guid: 971926d10021d478aa6e68d0e504890d, type: 3}
+  isADS: 0
+  actionID: 0
 --- !u!1 &7673487251499248762
 GameObject:
   m_ObjectHideFlags: 0

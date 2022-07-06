@@ -17,11 +17,9 @@ namespace Mirror.PlanetaryCombat
         [SerializeField] private float rotateY = 2f;
         [SerializeField] private float rotateZ = 0f;
 
-        private Vector3 adsOffset;
-
 
         [SyncVar]private GameObject parent;
-        private Player player;
+        private PlayerController controller;
         private Camera camera;
         private CinemachineBrain brain;
 
@@ -33,9 +31,9 @@ namespace Mirror.PlanetaryCombat
         {
             //各オブジェクトコンポーネント取得
             parent = transform.parent.gameObject;
-            player = parent.GetComponent<Player>();
+            controller = parent.GetComponent<PlayerController>();
             camera = transform.GetComponent<Camera>();
-            vcamera = player.vcamera.transform.GetComponent<CinemachineVirtualCamera>();
+            vcamera = controller.vcamera.transform.GetComponent<CinemachineVirtualCamera>();
             brain = transform.GetComponent<CinemachineBrain>();
 
             transform.rotation = transform.parent.rotation;
@@ -53,15 +51,15 @@ namespace Mirror.PlanetaryCombat
             var rotX = Input.GetAxis("Mouse X");
             var rotY = Input.GetAxis("Mouse Y");
             
-            if (!player.isADS) CameraRotate(rotX, rotY);
+            if (!controller.isADS) CameraRotate(rotX, rotY);
 
-            vcamera.enabled = player.isADS;
-            brain.enabled = player.isADS;
+            vcamera.enabled = controller.isADS;
+            brain.enabled = controller.isADS;
         }
 
         public void CameraRotate(float x,float y)
         {
-            transform.transform.Rotate(Vector3.left * y * player.mouseSensitivityY);
+            transform.transform.Rotate(Vector3.left * y * controller.mouseSensitivityY);
 
         }
 
