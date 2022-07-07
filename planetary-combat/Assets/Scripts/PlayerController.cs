@@ -9,6 +9,7 @@ namespace Mirror.PlanetaryCombat
     {
 		public float mouseSensitivityX = 1;
 		public float mouseSensitivityY = 1;
+
 		[SerializeField] private float jumpForce = 330;
 		[SerializeField] private float flyForce = 800;
 		[SerializeField] private float moveForce = 10;
@@ -16,7 +17,7 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField] private new GameObject camera;
 		[SerializeField] private Transform shotPoint;
 
-		public new GameObject vcamera;
+		//public new GameObject vcamera;
 
 		public bool isADS = false;
 
@@ -30,15 +31,25 @@ namespace Mirror.PlanetaryCombat
 
 		Rigidbody rb;
 
+		[SerializeField]
+		private float thrusterFuelBurnSpeed = 1f;
 
+		[SerializeField]
+		private float thrusterFuelRegenSpeed = 0.3f;
 
+		private float thrusterFuelAmount = 1f;
+
+		public float GetThrusterFuelAmount()
+		{
+			return thrusterFuelAmount;
+		}
 
 		private void Start()
 		{
 			if (rb == null) rb = GetComponent<Rigidbody>();
 			if (animation == null) animation = GetComponent<AnimationManager>();
 			if (flyEffect == null) flyEffect = GetComponent<FlyEffectManager>();
-			Application.targetFrameRate = 60;
+			//Application.targetFrameRate = 60;
 		}
 
 
@@ -47,7 +58,7 @@ namespace Mirror.PlanetaryCombat
 			base.OnStartLocalPlayer();
 			camera = Instantiate(camera);
 			camera.transform.SetParent(transform);
-			vcamera = Instantiate(vcamera);
+			//vcamera = Instantiate(vcamera);
 			Cursor.visible = false;
 			grounded = false;
 			actionID = ActionID.Fly;

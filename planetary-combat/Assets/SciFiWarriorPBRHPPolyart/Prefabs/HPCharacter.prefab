@@ -2305,16 +2305,15 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   username: 
-  mouseSensitivityX: 1
-  mouseSensitivityY: 1
-  jumpForce: 330
-  flyForce: 800
-  moveForce: 10
-  camera: {fileID: 0}
-  shotPoint: {fileID: 0}
-  vcamera: {fileID: 0}
-  isADS: 0
-  actionID: 0
+  isDead: 0
+  firstSetup: 0
+  maxHealth: 100
+  kills: 0
+  deaths: 0
+  disableOnDeath: []
+  disableGameObjectsOnDeath: []
+  deathEffect: {fileID: 0}
+  spawnEffect: {fileID: 0}
 --- !u!136 &4625661828891528520
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2576,7 +2575,9 @@ MonoBehaviour:
   shotPoint: {fileID: 9047216421678040258}
   vcamera: {fileID: 8147767586633497603, guid: 971926d10021d478aa6e68d0e504890d, type: 3}
   isADS: 0
-  actionID: 0
+  actionID: 4
+  thrusterFuelBurnSpeed: 1
+  thrusterFuelRegenSpeed: 0.3
 --- !u!1 &7673487251499248762
 GameObject:
   m_ObjectHideFlags: 0

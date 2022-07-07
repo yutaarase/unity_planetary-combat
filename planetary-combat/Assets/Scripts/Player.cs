@@ -17,6 +17,12 @@ namespace Mirror.PlanetaryCombat
 		[SyncVar]
 		private int currentHealth;
 
+		public float GetHealthPct()
+		{
+			return (float)currentHealth / maxHealth;
+		}
+
+
 		public int kills;
 		public int deaths;
 
@@ -163,15 +169,6 @@ namespace Mirror.PlanetaryCombat
 			{
 				disableGameObjectsOnDeath[i].SetActive(true);
 			}
-
-			//Enable the collider
-			Collider _col = GetComponent<Collider>();
-			if (_col != null)
-				_col.enabled = true;
-
-			//Create spawn effect
-			GameObject _gfxIns = (GameObject)Instantiate(spawnEffect, transform.position, Quaternion.identity);
-			Destroy(_gfxIns, 3f);
 		}
 	}
 }

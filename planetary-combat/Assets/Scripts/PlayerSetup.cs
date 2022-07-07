@@ -17,7 +17,7 @@ namespace Mirror.PlanetaryCombat
 		string dontDrawLayerName = "DontDraw";
 		[SerializeField]
 		GameObject playerGraphics;
-
+		 
 		[SerializeField]
 		GameObject playerUIPrefab;
 		[HideInInspector]
@@ -50,9 +50,9 @@ namespace Mirror.PlanetaryCombat
 				GetComponent<Player>().SetupPlayer();
 
 				string _username = "Loading...";
-				if (UserAccountManager.IsLoggedIn)
-					_username = UserAccountManager.LoggedIn_Username;
-				else
+				//if (UserAccountManager.IsLoggedIn)
+				//	_username = UserAccountManager.LoggedIn_Username;
+				//else
 					_username = transform.name;
 
 				CmdSetUsername(transform.name, _username);

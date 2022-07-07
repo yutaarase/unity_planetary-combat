@@ -23,7 +23,7 @@ namespace Mirror.PlanetaryCombat
         private Camera camera;
         private CinemachineBrain brain;
 
-        CinemachineVirtualCamera vcamera;
+        //CinemachineVirtualCamera vcamera;
 
 
         // Start is called before the first frame update 
@@ -33,15 +33,15 @@ namespace Mirror.PlanetaryCombat
             parent = transform.parent.gameObject;
             controller = parent.GetComponent<PlayerController>();
             camera = transform.GetComponent<Camera>();
-            vcamera = controller.vcamera.transform.GetComponent<CinemachineVirtualCamera>();
+            //vcamera = controller.vcamera.transform.GetComponent<CinemachineVirtualCamera>();
             brain = transform.GetComponent<CinemachineBrain>();
 
             transform.rotation = transform.parent.rotation;
             transform.localPosition = new Vector3(offsetX, offsetY, offsetZ);
             transform.localEulerAngles = new Vector3(rotateX, rotateY, rotateZ);
 
-            vcamera.Follow = parent.transform;
-            vcamera.LookAt = parent.transform;
+            //vcamera.Follow = parent.transform;
+            //vcamera.LookAt = parent.transform;
         }
 
         // Update is called once per frame
@@ -53,7 +53,7 @@ namespace Mirror.PlanetaryCombat
             
             if (!controller.isADS) CameraRotate(rotX, rotY);
 
-            vcamera.enabled = controller.isADS;
+            //vcamera.enabled = controller.isADS;
             brain.enabled = controller.isADS;
         }
 
@@ -90,7 +90,8 @@ namespace Mirror.PlanetaryCombat
             if (b)
             {
                 SetFOV(25f);
-                transform.parent = null;
+                //transform.parent = null;
+                //transform.position = controller.transform.position + controller.transform.forward * -2;
             }
             else
             {
