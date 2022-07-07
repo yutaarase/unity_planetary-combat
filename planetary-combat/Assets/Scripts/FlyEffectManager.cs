@@ -9,13 +9,13 @@ namespace Mirror.PlanetaryCombat
         [SerializeField] private GameObject[] flyeffect = new GameObject[2];
 
         [Command]
-        public void EffectActive(bool b)
+        public void CmdOnActive(bool b)
         {
-            setActive(b);
+            RpcOnActive(b);
         }
 
         [ClientRpc]
-        private void setActive(bool b)
+        private void RpcOnActive(bool b)
         {
             for (int i = 0; i < flyeffect.Length; ++i)
             {

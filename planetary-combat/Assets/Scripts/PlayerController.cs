@@ -145,7 +145,7 @@ namespace Mirror.PlanetaryCombat
 			CharaRotate(rotX, rotY);
 
 			animation.Action(actionID);
-			flyEffect.EffectActive(!grounded && actionID == ActionID.Fly);
+			flyEffect.CmdOnActive(!grounded && actionID == ActionID.Fly);
 		}
 
 		private void FixedUpdate()

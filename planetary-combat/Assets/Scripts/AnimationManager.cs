@@ -41,7 +41,7 @@ namespace Mirror.PlanetaryCombat
         }
 
         [Command]
-        public void Action(Player.ActionID id)
+        public void Action(PlayerController.ActionID id)
         {
             animator.SetInteger("ActionID", (int)id);
         }
@@ -50,6 +50,12 @@ namespace Mirror.PlanetaryCombat
         public void Fly(float p)
         {
             animator.SetFloat("Fly",p);
+        }
+
+        [Command]
+        public void SetPlaySpeed(float speed)
+        {
+            animator.speed = speed;
         }
 
         public enum GunID
@@ -61,12 +67,8 @@ namespace Mirror.PlanetaryCombat
         public enum Shot
         {
             Cease,
-            Fire
-        }
-
-        internal void Action(PlayerController.ActionID actionID)
-        {
-            throw new NotImplementedException();
+            Fire,
+            Reload
         }
     }
 }
