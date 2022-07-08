@@ -9,14 +9,6 @@ namespace Mirror.PlanetaryCombat
 
 		[SerializeField]
 		Behaviour[] componentsToDisable;
-
-		[SerializeField]
-		string remoteLayerName = "RemotePlayer";
-
-		[SerializeField]
-		string dontDrawLayerName = "DontDraw";
-		[SerializeField]
-		GameObject playerGraphics;
 		 
 		[SerializeField]
 		GameObject playerUIPrefab;
@@ -34,8 +26,6 @@ namespace Mirror.PlanetaryCombat
 			}
 			else
 			{
-				// Disable player graphics for local player
-				SetLayerRecursively(playerGraphics, LayerMask.NameToLayer(dontDrawLayerName));
 
 				// Create PlayerUI
 				playerUIInstance = Instantiate(playerUIPrefab);
@@ -92,7 +82,7 @@ namespace Mirror.PlanetaryCombat
 
 		void AssignRemoteLayer()
 		{
-			gameObject.layer = LayerMask.NameToLayer(remoteLayerName);
+			gameObject.layer = LayerMask.NameToLayer("Player");
 		}
 
 		void DisableComponents()
@@ -107,9 +97,6 @@ namespace Mirror.PlanetaryCombat
 		void OnDisable()
 		{
 			Destroy(playerUIInstance);
-
-			if (isLocalPlayer)
-				GameManager.instance.SetSceneCameraActive(true);
 
 			GameManager.UnRegisterPlayer(transform.name);
 		}

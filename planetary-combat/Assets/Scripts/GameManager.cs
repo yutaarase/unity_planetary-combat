@@ -12,9 +12,6 @@ namespace Mirror.PlanetaryCombat
 
 		public MatchSettings matchSettings;
 
-		[SerializeField]
-		private GameObject sceneCamera;
-
 		public delegate void OnPlayerKilledCallback(string player, string source);
 		public OnPlayerKilledCallback onPlayerKilledCallback;
 
@@ -28,14 +25,6 @@ namespace Mirror.PlanetaryCombat
 			{
 				instance = this;
 			}
-		}
-
-		public void SetSceneCameraActive(bool isActive)
-		{
-			if (sceneCamera == null)
-				return;
-
-			sceneCamera.SetActive(isActive);
 		}
 
 		private const string PLAYER_ID_PREFIX = "Player ";

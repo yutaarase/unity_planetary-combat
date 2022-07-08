@@ -139,7 +139,7 @@ namespace Mirror.PlanetaryCombat
 			if (isADS)
 			{
 				Vector3 vect = camera.transform.forward * 100 - (shotPoint.position - camera.transform.position);
-				transform.RotateAround(transform.position, transform.up, Vector3.SignedAngle(transform.forward, vect.normalized, transform.up) * Time.deltaTime);
+				//transform.RotateAround(transform.position, transform.up, Vector3.SignedAngle(transform.forward, vect.normalized, transform.up) * Time.deltaTime);
 			}
 
 

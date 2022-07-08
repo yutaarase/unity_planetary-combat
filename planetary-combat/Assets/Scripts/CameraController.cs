@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using Cinemachine;
+using UnityEngine.UI;
 
 namespace Mirror.PlanetaryCombat
 {
@@ -23,12 +24,18 @@ namespace Mirror.PlanetaryCombat
         private Camera camera;
         private CinemachineBrain brain;
 
+        [SerializeField] private Sprite [] reticle;
+
+        public GameObject image;
+
         //CinemachineVirtualCamera vcamera;
 
 
         // Start is called before the first frame update 
         void Start()
         {
+            image = GameObject.Find("reticle");
+
             //各オブジェクトコンポーネント取得
             parent = transform.parent.gameObject;
             controller = parent.GetComponent<PlayerController>();
@@ -51,7 +58,7 @@ namespace Mirror.PlanetaryCombat
             var rotX = Input.GetAxis("Mouse X");
             var rotY = Input.GetAxis("Mouse Y");
             
-            if (!controller.isADS) CameraRotate(rotX, rotY);
+            CameraRotate(rotX, rotY);
 
             //vcamera.enabled = controller.isADS;
             brain.enabled = controller.isADS;
@@ -87,19 +94,31 @@ namespace Mirror.PlanetaryCombat
 
         public void ADS(bool b)
         {
+            var img = image.GetComponent<Image>();
             if (b)
             {
                 SetFOV(25f);
-                //transform.parent = null;
-                //transform.position = controller.transform.position + controller.transform.forward * -2;
+                transform.localPosition = new Vector3(0f,2f, 2f);
+                img.sprite = reticle[1];
+                image.transform.localScale = new Vector3(32.5f,19.5f,0);
+                img.color = SetAlpha(img.color,0.2f);
             }
             else
             {
                 SetFOV(60f);
                 transform.SetParent(parent.transform);
                 CameraInit();
+                img.sprite = reticle[0];
+                image.transform.localScale = new Vector3(1, 1, 0);
+                img.color = SetAlpha(img.color, 1);
             }
 
+        }
+
+        Color SetAlpha(Color color, float value)
+        {
+            color.a = value;
+            return color;
         }
     }
 }

@@ -44,8 +44,6 @@ namespace Mirror.PlanetaryCombat
 		{
 			if (isLocalPlayer)
 			{
-				//Switch cameras
-				GameManager.instance.SetSceneCameraActive(false);
 				GetComponent<PlayerSetup>().playerUIInstance.SetActive(true);
 			}
 
@@ -91,11 +89,11 @@ namespace Mirror.PlanetaryCombat
 			}
 		}
 
-		private void Die(string _sourceID)
+		private void Die(string sourceID)
 		{
 			isDead = true;
 
-			Player sourcePlayer = GameManager.GetPlayer(_sourceID);
+			Player sourcePlayer = GameManager.GetPlayer(sourceID);
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;
@@ -128,7 +126,6 @@ namespace Mirror.PlanetaryCombat
 			//Switch cameras
 			if (isLocalPlayer)
 			{
-				GameManager.instance.SetSceneCameraActive(true);
 				GetComponent<PlayerSetup>().playerUIInstance.SetActive(false);
 			}
 
