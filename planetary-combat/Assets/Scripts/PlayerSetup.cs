@@ -31,12 +31,6 @@ namespace Mirror.PlanetaryCombat
 				playerUIInstance = Instantiate(playerUIPrefab);
 				playerUIInstance.name = playerUIPrefab.name;
 
-				// Configure PlayerUI
-				PlayerUI ui = playerUIInstance.GetComponent<PlayerUI>();
-				if (ui == null)
-					Debug.LogError("No PlayerUI component on PlayerUI prefab.");
-				ui.SetPlayer(GetComponent<Player>());
-
 				GetComponent<Player>().SetupPlayer();
 
 				string _username = "Loading...";

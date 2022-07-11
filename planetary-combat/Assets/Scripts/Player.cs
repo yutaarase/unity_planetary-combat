@@ -9,13 +9,13 @@ namespace Mirror.PlanetaryCombat
 		public string username;
 
 		public bool isDead;
-		public bool firstSetup;
+		public bool isSetup;
 
 		[SerializeField]
 		private int maxHealth = 100;
 
 		[SyncVar]
-		private int currentHealth;
+		public int currentHealth;
 
 		public float GetHealthPct()
 		{
@@ -39,8 +39,18 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField]
 		private GameObject spawnEffect;
 
-		
-		public void SetupPlayer()
+
+        private void OnCollisionStay(Collision collision)
+        {
+			RpcTakeDamage(1, transform.name);
+        }
+
+        private void Start()
+        {
+			//GameManager.RegisterPlayer(netId.ToString(),GetComponent<Player>());
+        }
+
+        public void SetupPlayer()
 		{
 			if (isLocalPlayer)
 			{
@@ -59,7 +69,7 @@ namespace Mirror.PlanetaryCombat
 		[ClientRpc]
 		private void RpcSetupPlayerOnAllClients()
 		{
-			if (firstSetup)
+			if (isSetup)
 			{
 				wasEnabled = new bool[disableOnDeath.Length];
 				for (int i = 0; i < wasEnabled.Length; i++)
@@ -67,10 +77,10 @@ namespace Mirror.PlanetaryCombat
 					wasEnabled[i] = disableOnDeath[i].enabled;
 				}
 
-				firstSetup = false;
+				isSetup = false;
 			}
 
-			SetDefaults();
+			Init();
 		}
 
 		[ClientRpc]
@@ -80,8 +90,6 @@ namespace Mirror.PlanetaryCombat
 				return;
 
 			currentHealth -= _amount;
-
-			Debug.Log(transform.name + " now has " + currentHealth + " health.");
 
 			if (currentHealth <= 0)
 			{
@@ -119,10 +127,6 @@ namespace Mirror.PlanetaryCombat
 			if (_col != null)
 				_col.enabled = false;
 
-			//Spawn a death effect
-			GameObject _gfxIns = (GameObject)Instantiate(deathEffect, transform.position, Quaternion.identity);
-			Destroy(_gfxIns, 3f);
-
 			//Switch cameras
 			if (isLocalPlayer)
 			{
@@ -149,7 +153,7 @@ namespace Mirror.PlanetaryCombat
 			Debug.Log(transform.name + " respawned.");
 		}
 
-		public void SetDefaults()
+		public void Init()
 		{
 			isDead = false;
 

@@ -2,30 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Mirror.PlanetaryCombat;
 
-namespace Mirror.PlanetaryCombat
-{
 	public class GameManager : MonoBehaviour
 	{
 
 		public static GameManager instance;
 
-		public MatchSettings matchSettings;
+	    public MatchSettings matchSettings;
 
 		public delegate void OnPlayerKilledCallback(string player, string source);
 		public OnPlayerKilledCallback onPlayerKilledCallback;
 
 		void Awake()
 		{
-			if (instance != null)
-			{
-				Debug.LogError("More than one GameManager in scene.");
-			}
-			else
-			{
-				instance = this;
-			}
+		if (instance == null)
+		{
+			instance = this;
+			DontDestroyOnLoad(this.gameObject);
 		}
+		else
+		{
+			Destroy(this.gameObject);
+		}
+	}
 
 		private const string PLAYER_ID_PREFIX = "Player ";
 
@@ -36,6 +36,7 @@ namespace Mirror.PlanetaryCombat
 			string _playerID = PLAYER_ID_PREFIX + _netID;
 			players.Add(_playerID, _player);
 			_player.transform.name = _playerID;
+			Debug.Log(_playerID);
 		}
 
 		public static void UnRegisterPlayer(string _playerID)
@@ -53,4 +54,3 @@ namespace Mirror.PlanetaryCombat
 			return players.Values.ToArray();
 		}
 	}
-}
