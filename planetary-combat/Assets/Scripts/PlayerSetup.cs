@@ -6,10 +6,6 @@ namespace Mirror.PlanetaryCombat
 {
 	public class PlayerSetup : NetworkBehaviour
 	{
-
-		[SerializeField]
-		Behaviour[] componentsToDisable;
-		 
 		[SerializeField]
 		GameObject playerUIPrefab;
 		[HideInInspector]
@@ -19,27 +15,13 @@ namespace Mirror.PlanetaryCombat
 		{
 			// Disable components that should only be
 			// active on the player that we control
-			if (!isLocalPlayer)
-			{
-				DisableComponents();
-			}
-			else
-			{
+			if (!isLocalPlayer) return;
+			
+			// Create PlayerUI
+			playerUIInstance = Instantiate(playerUIPrefab);
+			playerUIInstance.name = playerUIPrefab.name;
 
-				// Create PlayerUI
-				playerUIInstance = Instantiate(playerUIPrefab);
-				playerUIInstance.name = playerUIPrefab.name;
-
-				GetComponent<Player>().SetupPlayer();
-
-				string _username = "Loading...";
-				//if (UserAccountManager.IsLoggedIn)
-				//	_username = UserAccountManager.LoggedIn_Username;
-				//else
-					_username = transform.name;
-
-				CmdSetUsername(transform.name, _username);
-			}
+			GetComponent<Player>().SetupPlayer();
 		}
 
 		[Command]
@@ -53,16 +35,6 @@ namespace Mirror.PlanetaryCombat
 			}
 		}
 
-		void SetLayerRecursively(GameObject obj, int newLayer)
-		{
-			obj.layer = newLayer;
-
-			foreach (Transform child in obj.transform)
-			{
-				SetLayerRecursively(child.gameObject, newLayer);
-			}
-		}
-
 		public override void OnStartClient()
 		{
 			base.OnStartClient();
@@ -70,25 +42,24 @@ namespace Mirror.PlanetaryCombat
 			string _netID = GetComponent<NetworkIdentity>().netId.ToString();
 			Player _player = GetComponent<Player>();
 
-			GameManager.RegisterPlayer(_netID, _player);
+			yield return StartCoroutine(GameManager.RegisterPlayer(_netID, _player));
+			
+
+
+			string _username = "Loading...";
+
+			_username = transform.name;
+			//CmdSetUsername(transform.name, _username);
 		}
 
-		void DisableComponents()
-		{
-			for (int i = 0; i < componentsToDisable.Length; i++)
-			{
-				componentsToDisable[i].enabled = false;
-			}
-		}
 
-		// When we are destroyed
-		void OnDisable()
-		{
+        public override void OnStopClient()
+        {
+            base.OnStopClient();
+			GameManager.UnRegisterPlayer(transform.name);
 			Destroy(playerUIInstance);
 
-			GameManager.UnRegisterPlayer(transform.name);
 		}
-
 	}
 
 }

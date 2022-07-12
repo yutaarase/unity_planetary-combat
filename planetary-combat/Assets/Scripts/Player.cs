@@ -26,12 +26,6 @@ namespace Mirror.PlanetaryCombat
 		public int kills;
 		public int deaths;
 
-		[SerializeField]
-		private MonoBehaviour[] disableOnDeath;
-		private bool[] wasEnabled;
-
-		[SerializeField]
-		private GameObject[] disableGameObjectsOnDeath;
 
 		[SerializeField]
 		private GameObject deathEffect;
@@ -41,7 +35,7 @@ namespace Mirror.PlanetaryCombat
 
         private void Awake()
         {
-			disableOnDeath = GetComponentsInChildren<MonoBehaviour>();
+
 		}
 
         private void Start()
@@ -51,13 +45,6 @@ namespace Mirror.PlanetaryCombat
 
         public void SetupPlayer()
 		{
-			if (isLocalPlayer)
-			{
-				GetComponent<PlayerSetup>().playerUIInstance.SetActive(true);
-				
-
-			}
-
 			CmdBroadCastNewPlayerSetup();
 		}
 
@@ -70,17 +57,6 @@ namespace Mirror.PlanetaryCombat
 		[ClientRpc]
 		private void RpcSetupPlayerOnAllClients()
 		{
-			if (isSetup)
-			{
-				wasEnabled = new bool[disableOnDeath.Length];
-				for (int i = 0; i < wasEnabled.Length; i++)
-				{
-					wasEnabled[i] = disableOnDeath[i].enabled;
-				}
-
-				isSetup = false;
-			}
-
 			Init();
 		}
 
@@ -111,23 +87,6 @@ namespace Mirror.PlanetaryCombat
 
 			deaths++;
 
-			//Disable components
-			for (int i = 0; i < disableOnDeath.Length; i++)
-			{
-				disableOnDeath[i].enabled = false;
-			}
-
-			//Disable GameObjects
-			for (int i = 0; i < disableGameObjectsOnDeath.Length; i++)
-			{
-				disableGameObjectsOnDeath[i].SetActive(false);
-			}
-
-			//Disable the collider
-			Collider _col = GetComponent<Collider>();
-			if (_col != null)
-				_col.enabled = false;
-
 			//Switch cameras
 			if (isLocalPlayer)
 			{
@@ -136,22 +95,7 @@ namespace Mirror.PlanetaryCombat
 
 			Debug.Log(transform.name + " is DEAD!");
 
-			StartCoroutine(Respawn());
-		}
-
-		private IEnumerator Respawn()
-		{
-			yield return new WaitForSeconds(GameManager.instance.matchSettings.respawnTime);
-
-			Transform _spawnPoint = NetworkManager.singleton.GetStartPosition();
-			transform.position = _spawnPoint.position;
-			transform.rotation = _spawnPoint.rotation;
-
-			yield return new WaitForSeconds(0.1f);
-
-			SetupPlayer();
-
-			Debug.Log(transform.name + " respawned.");
+			
 		}
 
 		public void Init()
@@ -160,16 +104,11 @@ namespace Mirror.PlanetaryCombat
 
 			currentHealth = maxHealth;
 
-			//Enable the components
-			for (int i = 0; i < disableOnDeath.Length; i++)
-			{
-				disableOnDeath[i].enabled = wasEnabled[i];
-			}
 
-			//Enable the gameobjects
-			for (int i = 0; i < disableGameObjectsOnDeath.Length; i++)
+			//Switch cameras
+			if (isLocalPlayer)
 			{
-				disableGameObjectsOnDeath[i].SetActive(true);
+				GetComponent<PlayerSetup>().playerUIInstance.SetActive(true);
 			}
 		}
 	}
