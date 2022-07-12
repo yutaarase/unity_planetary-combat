@@ -11,8 +11,10 @@ using Mirror.PlanetaryCombat;
 
 	    public MatchSettings matchSettings;
 
-		public delegate void OnPlayerKilledCallback(string player, string source);
-		public OnPlayerKilledCallback onPlayerKilledCallback;
+		public void OnPlayerKilledCallback(string player, string source)
+		{
+			//Destroy(GetPlayer(player).gameObject);
+		}
 
 		void Awake()
 		{

@@ -108,6 +108,14 @@ namespace Mirror.PlanetaryCombat
 			if (Input.GetMouseButton(0))
 			{
 				Fire(AnimationManager.Shot.Fire);
+				RaycastHit hit;
+				if (Physics.Raycast(camera.transform.position, camera.transform.forward, out hit, 100))
+				{
+					if (hit.collider.tag == "Player")
+					{
+						CmdShot(hit.collider.transform.name, 100, transform.name);
+					}
+				}
 			}
 			else
 			{
@@ -164,6 +172,13 @@ namespace Mirror.PlanetaryCombat
 
 		}
 
+		[Command]
+		void CmdShot(string _playerID, int _damage, string _sourceID)
+        {
+			Player _player = GameManager.GetPlayer(_playerID);
+			Debug.Log("Target : " + _playerID +"Shooter : "  + _sourceID);
+			_player.RpcTakeDamage(_damage, _sourceID);
+		}
 
 		[Command]
 		void Jump()
@@ -203,8 +218,8 @@ namespace Mirror.PlanetaryCombat
 					if (hit.collider.tag == "Player")
 					{
 
-						Shot(hit.collider.gameObject);
-						hit.collider.gameObject.SetActive(false);
+						//Shot(hit.collider.gameObject);
+						//hit.collider.gameObject.SetActive(false);
 					}
 				}
 			}

@@ -27,7 +27,7 @@ namespace Mirror.PlanetaryCombat
 		public int deaths;
 
 		[SerializeField]
-		private Behaviour[] disableOnDeath;
+		private MonoBehaviour[] disableOnDeath;
 		private bool[] wasEnabled;
 
 		[SerializeField]
@@ -39,22 +39,23 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField]
 		private GameObject spawnEffect;
 
-
-        private void OnCollisionStay(Collision collision)
+        private void Awake()
         {
-			RpcTakeDamage(1, transform.name);
-        }
+			disableOnDeath = GetComponentsInChildren<MonoBehaviour>();
+		}
 
         private void Start()
         {
-			//GameManager.RegisterPlayer(netId.ToString(),GetComponent<Player>());
-        }
+			
+		}
 
         public void SetupPlayer()
 		{
 			if (isLocalPlayer)
 			{
 				GetComponent<PlayerSetup>().playerUIInstance.SetActive(true);
+				
+
 			}
 
 			CmdBroadCastNewPlayerSetup();
@@ -105,7 +106,7 @@ namespace Mirror.PlanetaryCombat
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;
-				GameManager.instance.onPlayerKilledCallback.Invoke(username, sourcePlayer.username);
+				GameManager.instance.OnPlayerKilledCallback(transform.name,sourceID);
 			}
 
 			deaths++;

@@ -22,7 +22,6 @@ namespace Mirror.PlanetaryCombat
 			if (!isLocalPlayer)
 			{
 				DisableComponents();
-				AssignRemoteLayer();
 			}
 			else
 			{
@@ -72,11 +71,6 @@ namespace Mirror.PlanetaryCombat
 			Player _player = GetComponent<Player>();
 
 			GameManager.RegisterPlayer(_netID, _player);
-		}
-
-		void AssignRemoteLayer()
-		{
-			gameObject.layer = LayerMask.NameToLayer("Player");
 		}
 
 		void DisableComponents()
