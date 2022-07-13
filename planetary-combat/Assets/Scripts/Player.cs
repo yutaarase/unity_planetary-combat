@@ -78,7 +78,7 @@ namespace Mirror.PlanetaryCombat
 		{
 			isDead = true;
 
-			Player sourcePlayer = GameManager.GetPlayer(sourceID);
+			Player sourcePlayer = GameManager.instance.GetPlayer(sourceID);
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;

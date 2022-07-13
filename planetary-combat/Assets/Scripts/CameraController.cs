@@ -21,7 +21,7 @@ namespace Mirror.PlanetaryCombat
 
         [SyncVar]private GameObject parent;
         private PlayerController controller;
-        private Camera camera;
+        private new Camera camera;
         private CinemachineBrain brain;
 
         [SerializeField] private Sprite [] reticle;

@@ -7,10 +7,6 @@ namespace Mirror.PlanetaryCombat
     [AddComponentMenu("")]
     public class NetworkManagerPyCt: NetworkManager
     {
-        private void Start()
-        {
-            
-        }
 
         /// <summary>
         /// サーバー開始時、プレイヤーキャラクターのメッセージを登録
