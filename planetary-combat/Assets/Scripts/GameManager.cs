@@ -14,7 +14,7 @@ public class GameManager : NetworkBehaviour
 
     private const string PLAYER_ID_PREFIX = "Player ";
 
-    public readonly SyncDictionary<string, Player> players = new SyncDictionary<string, Player>();
+    public static Dictionary<string, Player> players = new Dictionary<string, Player>();
 
     
 
@@ -53,7 +53,6 @@ public class GameManager : NetworkBehaviour
         string playerID = PLAYER_ID_PREFIX + netID;
         players.Add(playerID, player);
         player.transform.name = playerID;
-
     }
 
     [Command]
@@ -62,14 +61,25 @@ public class GameManager : NetworkBehaviour
         players.Remove(playerID);
     }
 
+    [Command]
+    public void CmdGetPlayer(string playerID)
+    {
+        cPlayer = players[playerID];
+    }
+
     [ClientRpc]
     public void RpcGetPlayer(string playerID)
     {
         cPlayer = players[playerID];
     }
 
+    [Server]
+    public Player SvrGetPlayer(string playerID)
+    {
+        return players[playerID];
+    }
 
-    public Player GetPlayer(string playerID)
+    public static Player GetPlayer(string playerID)
     {
         return players[playerID];
     }
@@ -88,7 +98,7 @@ public class GameManager : NetworkBehaviour
 
     private IEnumerator Respawn(Transform player)
     {
-        yield return new WaitForSeconds(matchSettings.respawnTime);
+        yield return new WaitForSeconds(instance.matchSettings.respawnTime);
 
         player.gameObject.SetActive(true);
 

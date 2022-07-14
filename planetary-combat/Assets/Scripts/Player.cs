@@ -61,16 +61,15 @@ namespace Mirror.PlanetaryCombat
 		}
 
 		[ClientRpc]
-		public void RpcTakeDamage(int _amount, string _sourceID)
+		public void RpcTakeDamage(int amount, string sourceID)
 		{
-			if (isDead)
-				return;
+			if (isDead) return;
 
-			currentHealth -= _amount;
+			currentHealth -= amount;
 
 			if (currentHealth <= 0)
 			{
-				Die(_sourceID);
+				Die(sourceID);
 			}
 		}
 
@@ -78,7 +77,8 @@ namespace Mirror.PlanetaryCombat
 		{
 			isDead = true;
 
-			Player sourcePlayer = GameManager.instance.GetPlayer(sourceID);
+			GameManager.instance.CmdGetPlayer(sourceID);
+			Player sourcePlayer = GameManager.instance.cPlayer;
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;

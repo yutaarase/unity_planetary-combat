@@ -175,10 +175,9 @@ namespace Mirror.PlanetaryCombat
 		[Command]
 		void CmdShot(string _playerID, int _damage, string _sourceID)
         {
-			GameManager.instance.RpcGetPlayer(_playerID);
-			Player _player = GameManager.instance.cPlayer;
+			Player player = GetComponent<Player>();
 			Debug.Log("Target : " + _playerID +"Shooter : "  + _sourceID);
-			_player.RpcTakeDamage(_damage, _sourceID);
+			player.RpcTakeDamage(_damage, _sourceID);
 		}
 
 		[Command]

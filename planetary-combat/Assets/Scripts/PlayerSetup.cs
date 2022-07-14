@@ -22,38 +22,45 @@ namespace Mirror.PlanetaryCombat
 			playerUIInstance.name = playerUIPrefab.name;
 
 			GetComponent<Player>().SetupPlayer();
+
+
 		}
 
 		[Command]
 		void CmdSetUsername(string playerID, string username)
 		{
-			GameManager.instance.RpcGetPlayer(playerID);
-
-			Player player = GameManager.instance.cPlayer;
+			Player player = GameManager.GetPlayer(playerID);
 			if (player != null)
 			{
 				Debug.Log(username + " has joined!");
 				player.username = username;
 			}
+
+			Debug.Log(player);
 		}
 
         public override void OnStartServer()
         {
             base.OnStartServer();
 
-			if (!isLocalPlayer) return;
-			string _netID = GetComponent<NetworkIdentity>().netId.ToString();
-			Player _player = GetComponent<Player>();
-
-			GameManager.instance.RegisterPlayer(_netID, _player);
+			
 		}
 
         public override void OnStartClient()
         {
             base.OnStartClient();
 
-            
-        }
+			string _netID = GetComponent<NetworkIdentity>().netId.ToString();
+			Player _player = GetComponent<Player>();
+
+			GameManager.instance.CmdRegisterPlayer(_netID, _player);
+
+
+			string _username = "Loading...";
+
+			_username = transform.name;
+			CmdSetUsername(transform.name, _username);
+		}
 
 
 
@@ -61,12 +68,7 @@ namespace Mirror.PlanetaryCombat
         {
             base.OnStartLocalPlayer();
 
-            if (!isLocalPlayer) return;
-
-            string _username = "Loading...";
-
-            _username = transform.name;
-            CmdSetUsername(transform.name, _username);
+           
         }
 
 
