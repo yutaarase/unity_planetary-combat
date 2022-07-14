@@ -10,13 +10,17 @@ public class GameManager : NetworkBehaviour
 
 	public static GameManager instance;
 
-	public MatchSettings matchSettings;
+    public MatchSettings matchSettings;
 
-	private const string PLAYER_ID_PREFIX = "Player ";
+    private const string PLAYER_ID_PREFIX = "Player ";
 
-	public readonly SyncDictionary<string, Player> players = new SyncDictionary<string, Player>();
+    public readonly SyncDictionary<string, Player> players = new SyncDictionary<string, Player>();
 
-	void Awake()
+    
+
+    [SyncVar] public Player cPlayer;
+
+    void Awake()
 	{
 		if (instance == null)
 		{
@@ -29,57 +33,72 @@ public class GameManager : NetworkBehaviour
 		}
 	}
 
-    public override void OnStartClient()
+    public override void OnStartServer()
     {
-        base.OnStartClient();
+        base.OnStartServer();
+    }
+
+
+    public void RegisterPlayer(string netID, Player player)
+    {
+        string playerID = PLAYER_ID_PREFIX + netID;
+        players.Add(playerID, player);
+        player.transform.name = playerID;
 
     }
 
+    [Command]
+    public void CmdRegisterPlayer(string netID, Player player)
+    {
+        string playerID = PLAYER_ID_PREFIX + netID;
+        players.Add(playerID, player);
+        player.transform.name = playerID;
+
+    }
+
+    [Command]
+    public void CmdUnRegisterPlayer(string playerID)
+    {
+        players.Remove(playerID);
+    }
+
+    [ClientRpc]
+    public void RpcGetPlayer(string playerID)
+    {
+        cPlayer = players[playerID];
+    }
+
+
+    public Player GetPlayer(string playerID)
+    {
+        return players[playerID];
+    }
+
+    public Player[] GetAllPlayers()
+    {
+        return players.Values.ToArray();
+    }
+
     public void OnPlayerKilledCallback(string playerID, string sourceID)
-	{
-		StartCoroutine(Respawn(GetPlayer(playerID).transform));
-		GetPlayer(playerID).gameObject.SetActive(false);
+    {
+        StartCoroutine(Respawn(GetPlayer(playerID).transform));
+        GetPlayer(playerID).gameObject.SetActive(false);
 
-	}
+    }
 
-	public void CmdRegisterPlayer(string _netID, Player _player)
-	{
-		string _playerID = PLAYER_ID_PREFIX + _netID;
-		players.Add(_playerID, _player);
-		_player.transform.name = _playerID;
+    private IEnumerator Respawn(Transform player)
+    {
+        yield return new WaitForSeconds(matchSettings.respawnTime);
 
-	}
+        player.gameObject.SetActive(true);
 
-	public void CmdUnRegisterPlayer(string _playerID)
-	{
-		players.Remove(_playerID);
-	}
+        Transform _spawnPoint = NetworkManager.singleton.GetStartPosition();
+        player.position = _spawnPoint.position;
+        player.rotation = _spawnPoint.rotation;
 
-	public Player GetPlayer(string _playerID)
-	{
-		return players[_playerID];
-	}
+        yield return new WaitForSeconds(0.1f);
 
 
-
-	public Player[] GetAllPlayers()
-	{
-		return players.Values.ToArray();
-	}
-
-	private IEnumerator Respawn(Transform player)
-	{
-		yield return new WaitForSeconds(instance.matchSettings.respawnTime);
-
-		player.gameObject.SetActive(true);
-
-		Transform _spawnPoint = NetworkManager.singleton.GetStartPosition();
-		player.position = _spawnPoint.position;
-		player.rotation = _spawnPoint.rotation;
-
-		yield return new WaitForSeconds(0.1f);
-
-		
-		player.GetComponent<Player>().SetupPlayer();
-	}
+        player.GetComponent<Player>().SetupPlayer();
+    }
 }

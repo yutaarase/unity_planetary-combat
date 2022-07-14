@@ -1,15 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
 
 namespace Mirror.PlanetaryCombat
 {
 	public class WeaponManager : NetworkBehaviour
 	{
-
-		[SerializeField]
-		private string weaponLayerName = "Weapon";
 
 		[SerializeField]
 		private Transform weaponHolder;
