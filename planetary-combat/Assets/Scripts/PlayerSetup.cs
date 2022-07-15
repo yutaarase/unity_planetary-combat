@@ -23,13 +23,14 @@ namespace Mirror.PlanetaryCombat
 
 			GetComponent<Player>().SetupPlayer();
 
+			
 
 		}
 
 		[Command]
 		void CmdSetUsername(string playerID, string username)
 		{
-			Player player = GameManager.GetPlayer(playerID);
+			Player player = GameManager.instance.GetPlayer(playerID);
 			if (player != null)
 			{
 				Debug.Log(username + " has joined!");
@@ -39,43 +40,70 @@ namespace Mirror.PlanetaryCombat
 			Debug.Log(player);
 		}
 
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
 
-			
-		}
+		public override void OnStartServer()
+		{
+			base.OnStartServer();
 
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
-
-			string _netID = GetComponent<NetworkIdentity>().netId.ToString();
-			Player _player = GetComponent<Player>();
-
-			GameManager.instance.CmdRegisterPlayer(_netID, _player);
-
-
-			string _username = "Loading...";
-
-			_username = transform.name;
-			CmdSetUsername(transform.name, _username);
 		}
 
 
 
-        public override void OnStartLocalPlayer()
+		public override void OnStartClient()
+		{
+			base.OnStartClient();
+
+
+		}
+
+		public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
+			string netID = GetComponent<NetworkIdentity>().netId.ToString();
+			Player player = GetComponent<Player>();
 
-           
+			GameManager.instance.RegisterPlayer(netID, player);
+		}
+
+		bool a = true;
+		bool b = true;
+        private void Update()
+        {
+			if (b)
+			{
+				if (GameManager.instance == null) return;
+				
+				b = false;
+			}
+
+			if (a)
+            {
+
+				if (GameManager.instance.GetPlayer(transform.name) != null){
+
+					Lug();
+					a = false;
+				}
+            }
         }
+
+
+        void Lug()
+        {
+
+			string username = "Loading...";
+
+			username = transform.name;
+			Debug.Log(transform.name);
+			CmdSetUsername(transform.name, username);
+		}
+
 
 
         public override void OnStopClient()
         {
             base.OnStopClient();
-			GameManager.instance.CmdUnRegisterPlayer(transform.name);
+			GameManager.instance.UnRegisterPlayer(transform.name);
 			Destroy(playerUIInstance);
 
 		}

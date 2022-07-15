@@ -14,72 +14,47 @@ public class GameManager : NetworkBehaviour
 
     private const string PLAYER_ID_PREFIX = "Player ";
 
-    public static Dictionary<string, Player> players = new Dictionary<string, Player>();
+    public  SyncDictionary<string, Player> players = new SyncDictionary<string, Player>();
 
     
 
     [SyncVar] public Player cPlayer;
 
-    void Awake()
+    void Start()
 	{
 		if (instance == null)
 		{
 			instance = this;
 			DontDestroyOnLoad(this.gameObject);
-		}
+        }
 		else
 		{
 			Destroy(this.gameObject);
 		}
 	}
 
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-    }
-
-
+    [Server]
     public void RegisterPlayer(string netID, Player player)
     {
         string playerID = PLAYER_ID_PREFIX + netID;
         players.Add(playerID, player);
         player.transform.name = playerID;
-
+        Test(netID);
     }
 
-    [Command]
-    public void CmdRegisterPlayer(string netID, Player player)
+    public void Test(string id)
     {
-        string playerID = PLAYER_ID_PREFIX + netID;
-        players.Add(playerID, player);
-        player.transform.name = playerID;
+        Debug.Log(id);
     }
 
-    [Command]
-    public void CmdUnRegisterPlayer(string playerID)
+    [Server]
+    public void UnRegisterPlayer(string playerID)
     {
         players.Remove(playerID);
     }
 
-    [Command]
-    public void CmdGetPlayer(string playerID)
-    {
-        cPlayer = players[playerID];
-    }
 
-    [ClientRpc]
-    public void RpcGetPlayer(string playerID)
-    {
-        cPlayer = players[playerID];
-    }
-
-    [Server]
-    public Player SvrGetPlayer(string playerID)
-    {
-        return players[playerID];
-    }
-
-    public static Player GetPlayer(string playerID)
+    public Player GetPlayer(string playerID)
     {
         return players[playerID];
     }
@@ -110,5 +85,6 @@ public class GameManager : NetworkBehaviour
 
 
         player.GetComponent<Player>().SetupPlayer();
+        Debug.Log("Player Respawn");
     }
 }

@@ -73,12 +73,14 @@ namespace Mirror.PlanetaryCombat
 			}
 		}
 
+		[Command]
 		private void Die(string sourceID)
 		{
 			isDead = true;
 
-			GameManager.instance.CmdGetPlayer(sourceID);
-			Player sourcePlayer = GameManager.instance.cPlayer;
+
+			Debug.Log("Player : "+GameManager.instance.GetPlayer(sourceID).username);
+			Player sourcePlayer = GameManager.instance.GetPlayer(sourceID);
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;
