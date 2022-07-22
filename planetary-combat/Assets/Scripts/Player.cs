@@ -33,6 +33,8 @@ namespace Mirror.PlanetaryCombat
 		[SerializeField]
 		private GameObject spawnEffect;
 
+		public PlayersManager playerManager;
+
         private void Awake()
         {
 
@@ -40,7 +42,7 @@ namespace Mirror.PlanetaryCombat
 
         private void Start()
         {
-			
+
 		}
 
         public void SetupPlayer()
@@ -79,13 +81,13 @@ namespace Mirror.PlanetaryCombat
 			isDead = true;
 
 
-			Debug.Log("Player : "+GameManager.instance.playerManager.GetPlayer(sourceID).username);
-			Player sourcePlayer = GameManager.instance.playerManager.GetPlayer(sourceID);
+			/*Debug.Log("Player : "+ playerManager.GetPlayer(sourceID).username);
+			Player sourcePlayer = playerManager.GetPlayer(sourceID);
 			if (sourcePlayer != null)
 			{
 				sourcePlayer.kills++;
-				GameManager.instance.OnPlayerKilledCallback(transform.name,sourceID);
-			}
+				playerManager.OnPlayerKilledCallback(transform.name,sourceID);
+			}*/
 
 			deaths++;
 

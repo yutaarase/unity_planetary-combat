@@ -865,11 +865,6 @@ namespace Mirror
             }
         }
 
-        internal void RemoveClientAuthority()
-        {
-            throw new NotImplementedException();
-        }
-
         // vis2k: readstring bug prevention: https://github.com/vis2k/Mirror/issues/2617
         // -> OnSerialize writes length,componentData,length,componentData,...
         // -> OnDeserialize carefully extracts each data, then deserializes each component with separate readers
@@ -1206,7 +1201,7 @@ namespace Mirror
         // Applies to objects that had authority set by AssignClientAuthority,
         // or NetworkServer.Spawn with a NetworkConnection parameter included.
         // Authority cannot be removed for player objects.
-        public void RemoveClientAuthority(NetworkConnectionToClient connectionToClient)
+        public void RemoveClientAuthority()
         {
             if (!isServer)
             {

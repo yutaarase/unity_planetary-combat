@@ -19,7 +19,6 @@ public class GameManager : NetworkBehaviour
 		if (instance == null)
 		{
 			instance = this;
-            playerManager = GetComponent<PlayersManager>();
 			DontDestroyOnLoad(this.gameObject);
         }
 		else

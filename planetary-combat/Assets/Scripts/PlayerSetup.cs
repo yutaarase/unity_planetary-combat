@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace Mirror.PlanetaryCombat
 {
-	public class PlayerSetup : NetworkBehaviour
+	internal class PlayerSetup : NetworkBehaviour
 	{
 		[SerializeField]
 		GameObject playerUIPrefab;
 		[HideInInspector]
 		public GameObject playerUIInstance;
+
+		public PlayersManager playerManager;
 
 		void Start()
 		{
@@ -21,16 +23,12 @@ namespace Mirror.PlanetaryCombat
 			playerUIInstance = Instantiate(playerUIPrefab);
 			playerUIInstance.name = playerUIPrefab.name;
 
-			GetComponent<Player>().SetupPlayer();
-
-			
-
 		}
 
 		[Command]
 		void CmdSetUsername(string playerID, string username)
 		{
-			Player player = GameObject.Find("NetworkManager").GetComponent<PlayersManager>().GetPlayer(playerID);
+			Player player = playerManager.GetPlayer(playerID);
 			if (player != null)
 			{
 				Debug.Log(username + " has joined!");
@@ -59,32 +57,32 @@ namespace Mirror.PlanetaryCombat
 		public override void OnStartLocalPlayer()
         {
             base.OnStartLocalPlayer();
-			string netID = GetComponent<NetworkIdentity>().netId.ToString();
-			Player player = GetComponent<Player>();
-
-			GameManager.instance.playerManager.RegisterPlayer(netID, player);
+			
 		}
-
+/*
 		bool a = true;
-		bool b = true;
+		bool b = true;*/
         private void Update()
         {
-			if (b)
+			/*if (b)
 			{
 				if (GameManager.instance == null) return;
-				
+				string netID = GetComponent<NetworkIdentity>().netId.ToString();
+				Player player = GetComponent<Player>();
+
+				playerManager.RegisterPlayer(netID, player);
 				b = false;
 			}
 
 			if (a)
             {
 
-				if (GameManager.instance.playerManager.GetPlayer(transform.name) != null){
+				if (playerManager.GetPlayer(transform.name) != null){
 
 					Lug();
 					a = false;
 				}
-            }
+            }*/
         }
 
 
@@ -103,10 +101,25 @@ namespace Mirror.PlanetaryCombat
         public override void OnStopClient()
         {
             base.OnStopClient();
-			GameManager.instance.playerManager.UnRegisterPlayer(transform.name);
 			Destroy(playerUIInstance);
 
 		}
-    }
+
+		internal static void InitialSpawn()
+		{
+			if (!NetworkServer.active) return;
+
+			//for (int i = 0; i < 10; i++)
+				//SpawnReward();
+		}
+
+		internal static void SpawnReward()
+		{
+			if (!NetworkServer.active) return;
+
+			Vector3 spawnPosition = new Vector3(Random.Range(-19, 20), 1, Random.Range(-19, 20));
+			NetworkServer.Spawn(Object.Instantiate(((NetworkRoomManagerPyCt)NetworkManager.singleton).rewardPrefab, spawnPosition, Quaternion.identity));
+		}
+	}
 
 }
